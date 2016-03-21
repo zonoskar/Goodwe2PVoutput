@@ -4,6 +4,12 @@ import pvoutput
 import csvoutput
 import time
 
+sid = 'da892c15-a156-4006-bd1d-5dacec1b64c3'
+sys_id = '40669'
+api_key = 'e804c1db643280f2c316a609133f1301f14462ad'
+csv_dir = '/media/pi/Data/PVoutput'
+
+
 def mainloop( goodwe, pvoutput, csv):
    interpolate = False
    write_header = True
@@ -51,11 +57,7 @@ def mainloop( goodwe, pvoutput, csv):
 
 if __name__ == "__main__":
    goodwe_url = 'http://goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail'
-   sid = 'da892c15-a156-4006-bd1d-5dacec1b64c3'
    pvoutput_url = 'http://pvoutput.org/service/r2/addstatus.jsp'
-   sys_id = '40669'
-   api_key = 'e804c1db643280f2c316a609133f1301f14462ad'
-   csv_dir = '/media/pi/Data/PVoutput'
    interval=4*60
    
    goodwe = readGoodwe.readGoodwe( goodwe_url, sid)
