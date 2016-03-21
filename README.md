@@ -4,7 +4,7 @@ Script to upload Goodwe power invertor data to PVoutput website
 
 Usage:
 
-Open file __main__.py. Edit the top variables:
+Open file _ _ main _ _.py. Edit the top variables:
 
    sid = '[your system ID on Goodwe-power.com]'
    
