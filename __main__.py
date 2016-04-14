@@ -2,67 +2,68 @@ import readGoodwe
 import goodweData
 import pvoutput
 import csvoutput
+import processData
 import time
 
-sid = 'da892c15-a156-4006-bd1d-5dacec1b64c3'
-sys_id = '40669'
-api_key = 'e804c1db643280f2c316a609133f1301f14462ad'
+# sid: The system ID as known on goodwe-power.com.
+sid = '<Goowde system ID>'
+
+# sys_id: The system ID as known on PVoutput
+sys_id = 'PVoutput system ID'
+
+# API key otained from PVoutput. You have to request this.
+api_key = 'PVoutput API key'
+
+# CSV logging directory
 csv_dir = '/media/pi/Data/PVoutput'
 
 
 def mainloop( goodwe, pvoutput, csv):
-   interpolate = False
-   write_header = True
-   prev_gw = None
-
+# Main processing loop
+#
    # Do for ever.
    while True:
-      try:
-	 r = goodwe.read_data()
-	 gw = goodweData.goodweData( r)
+      try: # Read Goodwe data from goodwe-power.com
+         r = goodwe.read_data()
+      except Exception, arg:
+         print "Read data Error: " + str(arg)
 
-	 if gw.is_online():
-	    interval = 4*60
-            csv.write_data( gw, write_header)
-	    write_header = False
+      try: # Convert the URL data to usable data oject
+         gw = goodweData.goodweData( r)
+      except Exception, arg:
+         print "Convert data Error: " + str(arg)
 
-            print "Measured    : " + gw.to_string()
-
-	    if gw.is_identical( prev_gw):
-               if interpolate:
-        	  pvoutput.post_data( prev_gw.m_pgrid, prev_gw.m_temperature, prev_gw.m_vpv1 + prev_gw.m_vpv2, interval = interval)
-	       interpolate = True
-	    else:
-	       if interpolate:
-        	  gw1 = gw.interpolate( prev_gw)
-        	  pvoutput.post_data( gw1.m_pgrid, gw1.m_temperature, gw1.m_vpv1 + gw1.m_vpv2, interval = interval)
-		  interpolate = False
-        	  time.sleep(60)
-        	  interval = 3*60
-
-               pvoutput.post_data( gw.m_pgrid, gw.m_temperature, gw.m_vpv1 + gw.m_vpv2)
-	 else:
-            print "Inverter is not online"
-	    interval = 20*60
-	    prev_gw = None
-	    write_header = True
-      except:
-	 print "read error"
-
-      prev_gw = gw
+      if gw.is_online():
+         # write CSV file
+         csv.write_data( gw)
+         interval = process.processSample( gw)
+      else:
+         # Wait for the inverter to come online
+         print "Inverter is not online"
+         interval = 20*60
+         csv.reset()
+	 process.reset()
+	 
+      # Wait for the next sample
       print "sleep " + str(interval) + " seconds before next sample"
       time.sleep(interval)
 
 
 
 if __name__ == "__main__":
+# Main entry point for the Goodwe to PVoutput logging script. Creates the
+# objects needed and sets the URL and system IDs. These are defined at the
+# start of this file
+#
+   # These URLs should be okay for Goodwe-power and PVoutput.org (and yes, there
+   # is a spelling error in the goodwe URL).
    goodwe_url = 'http://goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail'
    pvoutput_url = 'http://pvoutput.org/service/r2/addstatus.jsp'
-   interval=4*60
    
    goodwe = readGoodwe.readGoodwe( goodwe_url, sid)
    pvoutput = pvoutput.pvoutput( pvoutput_url, sys_id, api_key)
    csv = csvoutput.csvoutput( csv_dir, 'Goodwe_PV_data')
+   process = processData.processData( pvoutput, 4*60)
    
    # Perform main loop
    mainloop( goodwe, pvoutput, csv)
