@@ -21,6 +21,7 @@ class csvoutput :
    # the current date and time. When a header is not written, this is done.
    #
       t = time.localtime()
+      dateString = str(t.tm_year).zfill(4) + str(t.tm_mon).zfill(2) + str(t.tm_mday).zfill(2) + ',' + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + ','
       try:
          openname = self.m_filename + str(t.tm_year).zfill(4) + str(t.tm_mon).zfill(2) + str(t.tm_mday).zfill(2) + ".csv"
 
@@ -29,7 +30,7 @@ class csvoutput :
                fs.write( pvout.get_csv_header() + '\n')
                # next time, no need for a header
 	       self.m_write_header = False
-            fs.write( pvout.to_csv_string() + '\n')
+            fs.write( dateString + pvout.to_csv_string() + '\n')
       except Exception, arg:
          print "Write CSV data Error: " + str(arg)
      

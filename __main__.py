@@ -6,43 +6,43 @@ import processData
 import time
 
 # sid: The system ID as known on goodwe-power.com.
-sid = '<Goowde system ID>'
+sid = '[Your system ID on Goodwe-poer.com]'
 
 # sys_id: The system ID as known on PVoutput
-sys_id = 'PVoutput system ID'
+sys_id = '[your system ID on PVoutput.org]'
 
 # API key otained from PVoutput. You have to request this.
-api_key = 'PVoutput API key'
+api_key = '[Your PVoutput API key (generate one)]'
 
 # CSV logging directory
-csv_dir = '/media/pi/Data/PVoutput'
-
+csv_dir = '[Directory where you want the CSV files]'
 
 def mainloop( goodwe, pvoutput, csv):
 # Main processing loop
 #
    # Do for ever.
    while True:
+      interval = 4.0*60
       try: # Read Goodwe data from goodwe-power.com
          r = goodwe.read_data()
       except Exception, arg:
          print "Read data Error: " + str(arg)
-
-      try: # Convert the URL data to usable data oject
-         gw = goodweData.goodweData( r)
-      except Exception, arg:
-         print "Convert data Error: " + str(arg)
-
-      if gw.is_online():
-         # write CSV file
-         csv.write_data( gw)
-         interval = process.processSample( gw)
       else:
-         # Wait for the inverter to come online
-         print "Inverter is not online"
-         interval = 20*60
-         csv.reset()
-	 process.reset()
+         try: # Convert the URL data to usable data oject
+            gw = goodweData.goodweData( r)
+         except Exception, arg:
+            print "Convert data Error: " + str(arg)
+         else:
+            if gw.is_online():
+               # write CSV file
+               csv.write_data( gw)
+               process.processSample( gw)
+            else:
+               # Wait for the inverter to come online
+               print "Inverter is not online"
+               interval = 20.0*60
+               csv.reset()
+	       process.reset()
 	 
       # Wait for the next sample
       print "sleep " + str(interval) + " seconds before next sample"
@@ -63,7 +63,7 @@ if __name__ == "__main__":
    goodwe = readGoodwe.readGoodwe( goodwe_url, sid)
    pvoutput = pvoutput.pvoutput( pvoutput_url, sys_id, api_key)
    csv = csvoutput.csvoutput( csv_dir, 'Goodwe_PV_data')
-   process = processData.processData( pvoutput, 4*60)
+   process = processData.processData( pvoutput)
    
    # Perform main loop
    mainloop( goodwe, pvoutput, csv)

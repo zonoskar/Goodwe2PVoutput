@@ -6,7 +6,7 @@ class processData :
    INTERPOLATE = 'INTERPOLATE'
 
    #--------------------------------------------------------------------------
-   def __init__( self, pvoutput, interval):
+   def __init__( self, pvoutput):
    # Processing class. This class converts the data from the Goodwe logging
    # frequency of once every 10 min, to the log interval of 5 min of PVoutput
    # by interpolating.
@@ -18,7 +18,6 @@ class processData :
       self.m_state = self.BUFFERING                      
       self.m_prev_gw = None
       self.m_pvoutput = pvoutput
-      self.m_interval = interval
       
       
    #--------------------------------------------------------------------------
@@ -52,8 +51,7 @@ class processData :
          self.m_pvoutput.post_data( self.m_prev_gw.m_eday, 
                                     self.m_prev_gw.m_pgrid, 
                                     self.m_prev_gw.m_temperature, 
-                                    self.m_prev_gw.m_vpv1 + gw.m_vpv2,
-                                    interval = self.m_interval)
+                                    self.m_prev_gw.m_vpv1 + gw.m_vpv2)
       print "Logging: " + self.m_prev_gw.to_short_string()
       
       
@@ -73,8 +71,7 @@ class processData :
          self.m_pvoutput.post_data( gw1.m_eday, 
                                     gw1.m_pgrid, 
                                     gw1.m_temperature, 
-                                    gw1.m_vpv1 + gw1.m_vpv2, 
-                                    interval = self.m_interval)
+                                    gw1.m_vpv1 + gw1.m_vpv2)
       print "Interpolate: " + gw1.to_short_string()
       self.m_state = self.LOG_PREV_DIFF
 
@@ -100,6 +97,4 @@ class processData :
       self.m_switch[self.m_state](gw)
       
       self.m_prev_gw = gw
-
-      return self.m_interval
 

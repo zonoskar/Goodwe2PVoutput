@@ -13,12 +13,12 @@ class pvoutput :
       self.m_api_key = api_key
       
    #--------------------------------------------------------------------------
-   def post_data( self, eday, pgrid, temperature, voltage, interval = 0):
+   def post_data( self, eday, pgrid, temperature, voltage):
    # Post the inverter data to PVoutput. The eday value from Goodwe-power.com
    # is in kWh, but PVoutput.org wants this value in Wh, so it is multiplied 
    # by 1000.
    #
-      t = time.localtime(time.time()-interval)
+      t = time.localtime(time.time())
       header = {'X-Pvoutput-Apikey' : self.m_api_key,
                 'X-Pvoutput-SystemId' : self.m_system_id}
       post = {'d' : str(t.tm_year).zfill(4) + str(t.tm_mon).zfill(2) + str(t.tm_mday).zfill(2),
