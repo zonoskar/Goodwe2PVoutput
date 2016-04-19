@@ -39,7 +39,7 @@ def mainloop( goodwe, pvoutput, csv):
                process.processSample( gw)
             else:
                # Wait for the inverter to come online
-               print "Inverter is not online"
+               print "Inverter is not online: " + gw.to_string()
                interval = 20.0*60
                csv.reset()
 	       process.reset()
