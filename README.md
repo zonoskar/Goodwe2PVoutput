@@ -1,6 +1,7 @@
 # Goodwe2PVoutput
 Script to upload Goodwe power invertor data to PVoutput website
 
+Extract zip file to a directory named Goodwe2PVoutput (this is later used with the "python -m" command)
 
 Usage:
 
