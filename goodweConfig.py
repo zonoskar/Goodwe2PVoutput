@@ -22,6 +22,7 @@ class goodweConfig :
 	    line = line.replace(' ', '')
 	    line = line.replace('=', '')
 	    line = line.replace(':', '')
+	    line = line.replace('\'', '')
 	    
 	    if self.GOODWE_SYSTEM_ID in line:
 	       self.goodwe_system_id = line.replace(self.GOODWE_SYSTEM_ID, '')

@@ -7,13 +7,13 @@ Usage:
 
 Create a configuration file in your home directory indicated by the $HOME
 environment variable. This file must contain the following information (replace
-text between <> by your information, the order is not important):
+text between '' by your information, the order is not important):
 
-goodwe_system_id: <Your Goodwe system ID>
-goodwe_user_id: <Your username on goodwe-power.com>
-pvoutput_system_id: <Your PVOutput system ID>
-pvoutput_api: <Your PVOutput API key>
-csv_dir: <Path where the CSV files are stored>
+goodwe_system_id: 'Your Goodwe system ID'
+goodwe_user_id: 'Your username on goodwe-power.com'
+pvoutput_system_id: 'Your PVOutput system ID'
+pvoutput_api: 'Your PVOutput API key'
+csv_dir: 'Path where the CSV files are stored'
 
 The character '#' can be used to denote comments, from this character to the
 end of the line will be ignored.
