@@ -69,7 +69,7 @@ class test:
       gw12 = copy.deepcopy(gw10)
       gw12.m_inverter_sn = 12
       
-      process = processData.processData(None, 4*60)
+      process = processData.processData(None)
       process.reset()
       print "State:" + process.state_to_string()
       process.processSample( gw1)

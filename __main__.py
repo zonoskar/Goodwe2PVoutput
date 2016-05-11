@@ -1,21 +1,12 @@
 import readGoodwe
+import goodweConfig
 import goodweData
 import pvoutput
 import csvoutput
 import processData
 import time
-
-# sid: The system ID as known on goodwe-power.com.
-sid = '[Your system ID on Goodwe-poer.com]'
-
-# sys_id: The system ID as known on PVoutput
-sys_id = '[your system ID on PVoutput.org]'
-
-# API key otained from PVoutput. You have to request this.
-api_key = '[Your PVoutput API key (generate one)]'
-
-# CSV logging directory
-csv_dir = '[Directory where you want the CSV files]'
+import getpass
+import os
 
 def mainloop( goodwe, pvoutput, csv):
 # Main processing loop
@@ -52,18 +43,22 @@ def mainloop( goodwe, pvoutput, csv):
 
 if __name__ == "__main__":
 # Main entry point for the Goodwe to PVoutput logging script. Creates the
-# objects needed and sets the URL and system IDs. These are defined at the
-# start of this file
+# objects needed and sets the URL and system IDs. These are read from the
+# config file in ${HOME}/.goodwe2pvoutput
 #
-   # These URLs should be okay for Goodwe-power and PVoutput.org (and yes, there
-   # is a spelling error in the goodwe URL).
-   goodwe_url = 'http://goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail'
-   pvoutput_url = 'http://pvoutput.org/service/r2/addstatus.jsp'
-   
-   goodwe = readGoodwe.readGoodwe( goodwe_url, sid)
-   pvoutput = pvoutput.pvoutput( pvoutput_url, sys_id, api_key)
-   csv = csvoutput.csvoutput( csv_dir, 'Goodwe_PV_data')
+   home = os.environ['HOME']
+   config = goodweConfig.goodweConfig(home+'/.goodwe2pvoutput')
+   config.to_string()
+
+   goodwe = readGoodwe.readGoodwe( config.get_goodwe_url(), config.get_goodwe_loginUrl(), config.get_goodwe_system_id())
+   pvoutput = pvoutput.pvoutput( config.get_pvoutput_url(), config.get_pvoutput_system_id(), config.get_pvoutput_api())
+   csv = csvoutput.csvoutput( config.get_csv_dir(), 'Goodwe_PV_data')
    process = processData.processData( pvoutput)
    
+   # Request password for Goodwe-power.com
+   passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
+   password = getpass.getpass( passwd_text)
+   goodwe.login( config.get_goodwe_user_id(), password)
+
    # Perform main loop
    mainloop( goodwe, pvoutput, csv)

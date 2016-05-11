@@ -46,8 +46,8 @@ class goodweData :
    #data member values.
    #
       self.m_line = filteredData[0]
-      self.m_inverter_sn = filteredData[1]
-      self.m_inverter_status = filteredData[2]
+      self.m_inverter_status = filteredData[1]
+      self.m_inverter_sn = filteredData[2]
       self.m_error = filteredData[7]
 
       #Values that I'm not using (or don't know what they are
@@ -117,10 +117,12 @@ class goodweData :
    #converted to float or integers.
    #
       # Select from the HTTP data the table row with DG_Item
-      table = response[response.find('<tr class="DG_Item">')+20:]
+      table = response[response.find('id="tab_big"'):]
+      table = table[table.find('<tr>')+5:]
+      table = table[table.find('<tr>')+5:]
       table = table[:table.find('</tr>')]
       table = table.replace(' ', '')
-      
+
       # Split the table row in columns using the <td> HTTP tag
       r = table.split('<td>')
       l = []
