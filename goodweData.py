@@ -177,7 +177,7 @@ class goodweData :
    def is_online( self):
    #TRUE when the GoodWe inverter returns the correct status
    #
-      return (self.m_inverter_status == 'Normal') and (abs(self.m_vpv1+self.m_vpv2) > 0.05) and (abs(self.m_vpv2) > 0.05)
+      return (self.m_inverter_status == 'Normal') and (abs(self.m_vpv1+self.m_vpv2) > 0.01))
       
 
    #--------------------------------------------------------------------------
