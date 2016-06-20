@@ -1,4 +1,4 @@
-import requests
+from requests import requests
 import time
   
 class pvoutput :
@@ -29,7 +29,7 @@ class pvoutput :
               'v6' : str(voltage)}
       print str(post)
       try:
-         r = requests.requests.post(self.m_url, headers=header, data=post, timeout=20)
+         r = requests.post(self.m_url, headers=header, data=post, timeout=20)
          print r
       except Exception, arg:
          print "POST data Error: " + str(arg)

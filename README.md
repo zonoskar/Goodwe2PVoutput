@@ -5,9 +5,10 @@ Extract zip file to a directory named Goodwe2PVoutput (this is later used with t
 
 Usage:
 
-Create a configuration file in your home directory indicated by the $HOME
-environment variable. This file must contain the following information (replace
-text between '' by your information, the order is not important):
+Create a configuration file named .goodwe2pvoutput in your home directory
+indicated by the $HOME environment variable. This file must contain the
+following information (replace text between '' by your information, the order 
+is not important):
 
 goodwe_system_id: 'Your Goodwe system ID'
 goodwe_user_id: 'Your username on goodwe-power.com'
