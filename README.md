@@ -1,11 +1,18 @@
 # Goodwe2PVoutput
 Script to upload Goodwe power invertor data to PVoutput website. Now also logs extended data to PVoutput:
+
 v7: Voltage of string 1
+
 v8: Voltage of string 2
+
 v9: Generated power of string 1 (DC Voltage * DC Current * efficiency)
+
 v10: Generated power of string 1 (DC Voltage * DC Current * efficiency)
+
 v11: AC voltage (in case of 3 phase inverter, the average of the 3 AC voltages)
+
 v12: Efficiency (DC power / AC power)
+
 
 Extract zip file to a directory named Goodwe2PVoutput (this is later used with the "python -m" command). Make sure this directory is in the $PATH variable.
 
