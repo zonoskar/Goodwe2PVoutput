@@ -17,22 +17,22 @@ class goodweData :
       self.m_etotal = 0.0
       self.m_htotal = 0.0
       self.m_temperature = 0.0
-      self.m_vpv1 = 0.0
-      self.m_vpv2 = 0.0
-      self.m_ipv1 = 0.0
-      self.m_ipv2 = 0.0
-      self.m_vac1 = 0.0
-      self.m_vac2 = 0.0
-      self.m_vac3 = 0.0
-      self.m_iac1 = 0.0
-      self.m_iac2 = 0.0
-      self.m_iac3 = 0.0
-      self.m_fac1 = 0.0
-      self.m_fac2 = 0.0
-      self.m_fac3 = 0.0
-      self.m_loadV = 0.0
-      self.m_loadA = 0.0
-      self.m_loadW = 0.0
+
+      self.m_vpv = []
+      self.m_ipv = []
+      self.m_vac = []
+      self.m_iac = []
+      self.m_fac = []
+      self.m_load = []      
+
+      for i in range(3):
+         self.m_vpv.append(0.0)
+         self.m_ipv.append(0.0)
+         self.m_vac.append(0.0)
+         self.m_iac.append(0.0)
+         self.m_fac.append(0.0)
+         self.m_load.append(0.0)
+
       self.m_consume_day = 0.0
       self.m_consume_total = 0.0
       self.m_efficiency = 0.0
@@ -57,55 +57,45 @@ class goodweData :
 
       # Only select 1 significant digit after .
       try:
-         self.m_pgrid = float(filteredData[3].replace('W', ''))
-         self.m_eday = float(filteredData[4].replace('kWh', ''))
-         self.m_etotal = float(filteredData[5].replace('kWh', ''))
-         self.m_htotal = float(filteredData[6].replace('h', ''))
+         self.m_pgrid = float(filteredData[3])
+         self.m_eday = float(filteredData[4])
+         self.m_etotal = float(filteredData[5])
+         self.m_htotal = float(filteredData[6])
          self.m_temperature = float(filteredData[13][0:filteredData[13].find('.')+2])
 
          #multi line values, separated by '/'
          v = filteredData[8].split('/')
-         if len(v) > 1:
-            self.m_vpv1 = float(v[0].replace('V', ''))
-            self.m_vpv2 = float(v[1].replace('V', ''))
+         for frac in range(len(v)):
+            self.m_vpv[frac] = float(v[frac])
 
          i = filteredData[9].split('/')
-         if len(i) > 1:
-            self.m_ipv1 = float(i[0].replace('A', ''))
-            self.m_ipv2 = float(i[1].replace('A', ''))
+         for frac in range(len(i)):
+            self.m_ipv[frac] = float(i[frac])
       
          v = filteredData[10].split('/')
-         if len(v) > 1:
-            self.m_vac1 = float(v[0].replace('V', ''))
-            self.m_vac2 = float(v[1].replace('V', ''))
-            self.m_vac3 = float(v[2].replace('V', ''))
+         for frac in range(len(v)):
+            self.m_vac[frac] = float(v[frac])
          
          i = filteredData[11].split('/')
-         if len(i) > 1:
-            self.m_iac1 = float(i[0].replace('A', ''))
-            self.m_iac2 = float(i[1].replace('A', ''))
-            self.m_iac3 = float(i[2].replace('A', ''))
+         for frac in range(len(i)):
+            self.m_iac[frac] = float(i[frac])
          
-         f = filteredData[11].split('/')
-         if len(i) > 1:
-            self.m_fac1 = float(f[0].replace('Hz', ''))
-            self.m_fac2 = float(f[1].replace('Hz', ''))
-            self.m_fac3 = float(f[2].replace('Hz', ''))
+         f = filteredData[12].split('/')
+         for frac in range(len(f)):
+            self.m_fac[frac] = float(f[frac])
 
          load = filteredData[17].split('/')
-         if len(load) > 1:
-            self.m_loadV = float(load[0].replace('V', ''))
-            self.m_loadA = float(load[1].replace('A', ''))
-            self.m_loadW = float(load[2].replace('KW', ''))
+         for frac in range(len(load)):
+            self.m_load[frac] = float(load[frac])
 
-         self.m_consume_day = float(filteredData[18].replace('kWh', ''))
-         self.m_consume_total = float(filteredData[19].replace('kWh', ''))
+         self.m_consume_day = float(filteredData[18])
+         self.m_consume_total = float(filteredData[19])
       except(ValueError):
          #use default values
          pass
 
       # Calculate efficiency (PowerAC / powerDC)
-      ppv = ((self.m_vpv1 * self.m_ipv1) + (self.m_vpv2 * self.m_ipv2))
+      ppv = ((self.m_vpv[0] * self.m_ipv[0]) + (self.m_vpv[1] * self.m_ipv[1]))
       if ppv > 0.0:
          self.m_efficiency = self.m_pgrid / ppv
 
@@ -142,6 +132,9 @@ class goodweData :
             line=line.replace(' ', '')
             l.append(line)
 	    
+      if len(l) != 20:
+          print "Repsonse from Goodwe does not contain all data: " + str(l)
+	  
       return l
    
 
@@ -149,7 +142,7 @@ class goodweData :
    def to_short_string( self):
    #Creates a string repesentation of the class
    #
-      return "S/N: " + str(self.m_inverter_sn) + " P:" + str(self.m_pgrid) + " E:" + str(self.m_eday) + " V:" + str(self.m_vpv1+self.m_vpv2)
+      return "S/N: " + str(self.m_inverter_sn) + " P:" + str(self.m_pgrid) + " E:" + str(self.m_eday) + " V:" + str(self.m_vpv[0]+self.m_vpv[1])
 
 
    #--------------------------------------------------------------------------
@@ -163,7 +156,7 @@ class goodweData :
    def to_csv_string( self):
    #Creates a string repesentation of the class, separated by ','.
    #
-      return str(self.m_line) + ", " + str(self.m_inverter_sn) + ", " + str(self.m_inverter_status) + ", " + str(self.m_pgrid) + ", " + str(self.m_eday) + ", " + str(self.m_etotal) + ", " + str(self.m_htotal) + ", " + str(self.m_error) + ", " + str(self.m_vpv1) + ", " + str(self.m_vpv2) + ", " + str(self.m_ipv1) + ", " + str(self.m_ipv2) + ", " + str(self.m_vac1) + ", " + str(self.m_vac2) + ", " + str(self.m_vac3) + ", " + str(self.m_iac1) + ", " + str(self.m_iac2) + ", " + str(self.m_iac3) + ", " + str(self.m_fac1) + ", " + str(self.m_fac2) + ", " + str(self.m_fac3) + ", " + str(self.m_temperature) + ", " + str(self.m_vbattery) + ", " + str(self.m_ibattery) + ", " + str(self.m_soc) + ", " + str(self.m_loadV) + ", " + str(self.m_loadA) + ", " + str(self.m_loadW) + ", " + str(self.m_consume_day) + ", " + str(self.m_consume_total) + ", " + str(self.m_efficiency)
+      return str(self.m_line) + ", " + str(self.m_inverter_sn) + ", " + str(self.m_inverter_status) + ", " + str(self.m_pgrid) + ", " + str(self.m_eday) + ", " + str(self.m_etotal) + ", " + str(self.m_htotal) + ", " + str(self.m_error) + ", " + str(self.m_vpv[0]) + ", " + str(self.m_vpv[1]) + ", " + str(self.m_ipv[0]) + ", " + str(self.m_ipv[1]) + ", " + str(self.m_vac[0]) + ", " + str(self.m_vac[1]) + ", " + str(self.m_vac[2]) + ", " + str(self.m_iac[0]) + ", " + str(self.m_iac[1]) + ", " + str(self.m_iac[2]) + ", " + str(self.m_fac[0]) + ", " + str(self.m_fac[1]) + ", " + str(self.m_fac[2]) + ", " + str(self.m_temperature) + ", " + str(self.m_vbattery) + ", " + str(self.m_ibattery) + ", " + str(self.m_soc) + ", " + str(self.m_load[0]) + ", " + str(self.m_load[1]) + ", " + str(self.m_load[2]) + ", " + str(self.m_consume_day) + ", " + str(self.m_consume_total) + ", " + str(self.m_efficiency)
 
 
    #--------------------------------------------------------------------------
@@ -177,7 +170,7 @@ class goodweData :
    def is_online( self):
    #TRUE when the GoodWe inverter returns the correct status
    #
-      return ((self.m_inverter_status == 'Normal') and (abs(self.m_vpv1+self.m_vpv2) > 0.01))
+      return ((self.m_inverter_status == 'Normal') and (abs(self.m_vpv[0]+self.m_vpv[1]) > 0.01))
       
 
    #--------------------------------------------------------------------------
@@ -189,20 +182,20 @@ class goodweData :
       if not gw:
          return False
          
-      if (abs(self.m_vpv1 - gw.m_vpv1) < eps) and \
-         (abs(self.m_vpv2 - gw.m_vpv2) < eps) and \
-         (abs(self.m_ipv1 - gw.m_ipv1) < eps) and \
-         (abs(self.m_ipv2 - gw.m_ipv2) < eps) and \
+      if (abs(self.m_vpv[0] - gw.m_vpv[0]) < eps) and \
+         (abs(self.m_vpv[1] - gw.m_vpv[1]) < eps) and \
+         (abs(self.m_ipv[0] - gw.m_ipv[0]) < eps) and \
+         (abs(self.m_ipv[1] - gw.m_ipv[1]) < eps) and \
          (abs(self.m_pgrid - gw.m_pgrid) < eps) and \
-         (abs(self.m_vac1 - gw.m_vac1) < eps) and \
-         (abs(self.m_vac2 - gw.m_vac2) < eps) and \
-         (abs(self.m_vac3 - gw.m_vac3) < eps) and \
-         (abs(self.m_iac1 - gw.m_iac1) < eps) and \
-         (abs(self.m_iac2 - gw.m_iac2) < eps) and \
-         (abs(self.m_iac3 - gw.m_iac3) < eps) and \
-         (abs(self.m_fac1 - gw.m_fac1) < eps) and \
-         (abs(self.m_fac2 - gw.m_fac2) < eps) and \
-         (abs(self.m_fac3 - gw.m_fac3) < eps) :
+         (abs(self.m_vac[0] - gw.m_vac[0]) < eps) and \
+         (abs(self.m_vac[1] - gw.m_vac[1]) < eps) and \
+         (abs(self.m_vac[2] - gw.m_vac[2]) < eps) and \
+         (abs(self.m_iac[0] - gw.m_iac[0]) < eps) and \
+         (abs(self.m_iac[1] - gw.m_iac[1]) < eps) and \
+         (abs(self.m_iac[2] - gw.m_iac[2]) < eps) and \
+         (abs(self.m_fac[0] - gw.m_fac[0]) < eps) and \
+         (abs(self.m_fac[1] - gw.m_fac[1]) < eps) and \
+         (abs(self.m_fac[2] - gw.m_fac[2]) < eps) :
          return True
          
       return False      
@@ -215,24 +208,25 @@ class goodweData :
    #
       igw = gw
       
-      igw.m_vpv1 = (self.m_vpv1 + gw.m_vpv1) / 2
-      igw.m_vpv2 = (self.m_vpv2 + gw.m_vpv2) / 2
-      igw.m_ipv1 = (self.m_ipv1 + gw.m_ipv1) / 2
-      igw.m_ipv2 = (self.m_ipv2 + gw.m_ipv2) / 2
-      igw.m_vac1 = (self.m_vac1 + gw.m_vac1) / 2
-      igw.m_vac2 = (self.m_vac2 + gw.m_vac2) / 2
-      igw.m_vac3 = (self.m_vac3 + gw.m_vac3) / 2
-      igw.m_iac1 = (self.m_iac1 + gw.m_iac1) / 2
-      igw.m_iac2 = (self.m_iac2 + gw.m_iac2) / 2
-      igw.m_iac3 = (self.m_iac3 + gw.m_iac3) / 2
-      igw.m_fac1 = (self.m_fac1 + gw.m_fac1) / 2
-      igw.m_fac2 = (self.m_fac2 + gw.m_fac2) / 2
-      igw.m_fac3 = (self.m_fac3 + gw.m_fac3) / 2
+      igw.m_vpv[0] = (self.m_vpv[0] + gw.m_vpv[0]) / 2
+      igw.m_vpv[1] = (self.m_vpv[1] + gw.m_vpv[1]) / 2
+      igw.m_ipv[0] = (self.m_ipv[0] + gw.m_ipv[0]) / 2
+      igw.m_ipv[1] = (self.m_ipv[1] + gw.m_ipv[1]) / 2
+      igw.m_vac[0] = (self.m_vac[0] + gw.m_vac[0]) / 2
+      igw.m_vac[1] = (self.m_vac[1] + gw.m_vac[1]) / 2
+      igw.m_vac[2] = (self.m_vac[2] + gw.m_vac[2]) / 2
+      igw.m_iac[0] = (self.m_iac[0] + gw.m_iac[0]) / 2
+      igw.m_iac[1] = (self.m_iac[1] + gw.m_iac[1]) / 2
+      igw.m_iac[2] = (self.m_iac[2] + gw.m_iac[2]) / 2
+      igw.m_fac[0] = (self.m_fac[0] + gw.m_fac[0]) / 2
+      igw.m_fac[1] = (self.m_fac[1] + gw.m_fac[1]) / 2
+      igw.m_fac[2] = (self.m_fac[2] + gw.m_fac[2]) / 2
       igw.m_pgrid = (self.m_pgrid + gw.m_pgrid) / 2
       igw.m_eday = (self.m_eday + gw.m_eday) / 2
       igw.m_etotal = (self.m_etotal + gw.m_etotal) / 2
       igw.m_htotal = (self.m_htotal + gw.m_htotal) / 2
       igw.m_temperature = (self.m_temperature + gw.m_temperature) / 2
+      igw.m_efficiency = (self.m_efficiency + gw.m_efficiency) / 2
       
       return igw
       

@@ -48,10 +48,7 @@ class processData :
    # Processes the LOGGING state. This logs the m_prev_gw data
    #
       if self.m_pvoutput:
-         self.m_pvoutput.post_data( self.m_prev_gw.m_eday, 
-                                    self.m_prev_gw.m_pgrid, 
-                                    self.m_prev_gw.m_temperature, 
-                                    self.m_prev_gw.m_vpv1 + gw.m_vpv2)
+         self.m_pvoutput.post_data( self.m_prev_gw)
       print "Logging: " + self.m_prev_gw.to_short_string()
       
       
@@ -68,10 +65,7 @@ class processData :
    #
       gw1 = gw.interpolate( self.m_prev_gw)
       if self.m_pvoutput:
-         self.m_pvoutput.post_data( gw1.m_eday, 
-                                    gw1.m_pgrid, 
-                                    gw1.m_temperature, 
-                                    gw1.m_vpv1 + gw1.m_vpv2)
+         self.m_pvoutput.post_data( gw1)
       print "Interpolate: " + gw1.to_short_string()
       self.m_state = self.LOG_PREV_DIFF
 
