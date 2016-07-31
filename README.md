@@ -1,5 +1,18 @@
 # Goodwe2PVoutput
-Script to upload Goodwe power invertor data to PVoutput website
+Script to upload Goodwe power invertor data to PVoutput website. Now also logs extended data to PVoutput:
+
+v7: Voltage of string 1
+
+v8: Voltage of string 2
+
+v9: Generated power of string 1 (DC Voltage * DC Current * efficiency)
+
+v10: Generated power of string 1 (DC Voltage * DC Current * efficiency)
+
+v11: AC voltage (in case of 3 phase inverter, the average of the 3 AC voltages)
+
+v12: Efficiency (DC power / AC power)
+
 
 Extract zip file to a directory named Goodwe2PVoutput (this is later used with the "python -m" command). Make sure this directory is in the $PATH variable.
 
@@ -11,13 +24,17 @@ following information (replace text between '' by your information, the order
 is not important):
 
 goodwe_system_id: 'Your Goodwe system ID'
+
 goodwe_user_id: 'Your username on goodwe-power.com'
+
 pvoutput_system_id: 'Your PVOutput system ID'
+
 pvoutput_api: 'Your PVOutput API key'
+
 csv_dir: 'Path where the CSV files are stored'
 
 The character '#' can be used to denote comments, from this character to the
-end of the line will be ignored.
+end of the line will be ignored. An example is provided in the data direcotry.
 
 Make sure the file is readable by everyone.
 
