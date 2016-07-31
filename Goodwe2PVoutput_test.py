@@ -9,7 +9,7 @@ class test:
       
       
    def test_1( self):
-      gw1 = goodweData.goodweData('<tr class=\"DG_Item\"><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>')
+      gw1 = goodweData.goodweData('id="tab_big"><tr></tr><tr class=\"DG_Item\"><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0/1.0<c/td><td>1.0/1.0</td><td>1.0/1.0</td><td>1.0/1.0/1.0</td><td>1.0/1.0/1.0</td><td>1.0/1.0/1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0/1.0/1.0</td><td>1.0</td><td>1.0</td></tr>')
 
       gw1.m_inverter_sn = 1
       gw1.m_vpv[0] = 1.0

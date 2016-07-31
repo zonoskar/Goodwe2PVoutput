@@ -17,13 +17,13 @@ class goodweData :
       self.m_etotal = 0.0
       self.m_htotal = 0.0
       self.m_temperature = 0.0
+      self.m_load = ''
 
       self.m_vpv = []
       self.m_ipv = []
       self.m_vac = []
       self.m_iac = []
       self.m_fac = []
-      self.m_load = []      
 
       for i in range(3):
          self.m_vpv.append(0.0)
@@ -31,14 +31,19 @@ class goodweData :
          self.m_vac.append(0.0)
          self.m_iac.append(0.0)
          self.m_fac.append(0.0)
-         self.m_load.append(0.0)
 
       self.m_consume_day = 0.0
       self.m_consume_total = 0.0
       self.m_efficiency = 0.0
       
-      filteredData = self.filter_data( urlData)
-      self.parse_data( filteredData)
+      try:
+         filteredData = self.filter_data( urlData)
+      except Exception, arg:
+         print "Filter data Error: " + str(arg)
+      try:
+         self.parse_data( filteredData)
+      except Exception, arg:
+         print "Parse data Error: " + str(arg)
 
    #--------------------------------------------------------------------------
    def parse_data( self, filteredData):
@@ -54,50 +59,56 @@ class goodweData :
       self.m_vbattery = filteredData[14].replace(' ', '') # 0.0/0.0V
       self.m_ibattery = filteredData[15].replace(' ', '') # 0.0/0.0A
       self.m_soc = filteredData[16].replace(' ', '') # 0/0%
+      self.m_load = filteredData[17].replace(' ', '') # 0.0V/0.0A/0.000KW
 
+      self.m_pgrid = self._convert_line_to_float(filteredData[3])
+      self.m_eday = self._convert_line_to_float(filteredData[4])
+      self.m_etotal = self._convert_line_to_float(filteredData[5])
+      self.m_htotal = self._convert_line_to_float(filteredData[6])
       # Only select 1 significant digit after .
-      try:
-         self.m_pgrid = float(filteredData[3])
-         self.m_eday = float(filteredData[4])
-         self.m_etotal = float(filteredData[5])
-         self.m_htotal = float(filteredData[6])
-         self.m_temperature = float(filteredData[13][0:filteredData[13].find('.')+2])
+      self.m_temperature = float(filteredData[13][0:filteredData[13].find('.')+2])
 
-         #multi line values, separated by '/'
-         v = filteredData[8].split('/')
-         for frac in range(len(v)):
-            self.m_vpv[frac] = float(v[frac])
+      #multi line values, separated by '/'
+      v = filteredData[8].split('/')
+      if len(v) != 2:
+         print "filteredData[8] does not contain all data: " + str(filteredData[8])
+      for frac in range(len(v)):
+         self.m_vpv[frac] = self._convert_line_to_float(v[frac])
 
-         i = filteredData[9].split('/')
-         for frac in range(len(i)):
-            self.m_ipv[frac] = float(i[frac])
-      
-         v = filteredData[10].split('/')
-         for frac in range(len(v)):
-            self.m_vac[frac] = float(v[frac])
-         
-         i = filteredData[11].split('/')
-         for frac in range(len(i)):
-            self.m_iac[frac] = float(i[frac])
-         
-         f = filteredData[12].split('/')
-         for frac in range(len(f)):
-            self.m_fac[frac] = float(f[frac])
+      i = filteredData[9].split('/')
+      if len(i) != 2:
+         print "filteredData[9] does not contain all data: " + str(filteredData[9])
+      for frac in range(len(i)):
+         self.m_ipv[frac] = self._convert_line_to_float(i[frac])
 
-         load = filteredData[17].split('/')
-         for frac in range(len(load)):
-            self.m_load[frac] = float(load[frac])
+      v = filteredData[10].split('/')
+      if len(v) != 3:
+         print "filteredData[10] does not contain all data: " + str(filteredData[10])
+      for frac in range(len(v)):
+         self.m_vac[frac] = self._convert_line_to_float(v[frac])
 
-         self.m_consume_day = float(filteredData[18])
-         self.m_consume_total = float(filteredData[19])
-      except(ValueError):
-         #use default values
-         pass
+      i = filteredData[11].split('/')
+      if len(i) != 3:
+         print "filteredData[11] does not contain all data: " + str(filteredData[11])
+      for frac in range(len(i)):
+         self.m_iac[frac] = self._convert_line_to_float(i[frac])
+
+      f = filteredData[12].split('/')
+      if len(f) != 3:
+         print "filteredData[12] does not contain all data: " + str(filteredData[12])
+      for frac in range(len(f)):
+         self.m_fac[frac] = self._convert_line_to_float(f[frac])
+
+      self.m_consume_day = self._convert_line_to_float(filteredData[18])
+      self.m_consume_total = self._convert_line_to_float(filteredData[19])
 
       # Calculate efficiency (PowerAC / powerDC)
-      ppv = ((self.m_vpv[0] * self.m_ipv[0]) + (self.m_vpv[1] * self.m_ipv[1]))
-      if ppv > 0.0:
-         self.m_efficiency = self.m_pgrid / ppv
+      try:
+         ppv = ((self.m_vpv[0] * self.m_ipv[0]) + (self.m_vpv[1] * self.m_ipv[1]))
+         if ppv > 0.0:
+            self.m_efficiency = self.m_pgrid / ppv
+      except Exception, arg:
+         print "Calculate Efficiency Error: " + str(arg)
 
 
    #--------------------------------------------------------------------------
@@ -120,23 +131,31 @@ class goodweData :
          if '</td>' in line:
             line=line.replace('</td>', '')
             line=line.replace('\r\n', '')
-            line=line.replace('A', '')
-            line=line.replace('V', '')
-            line=line.replace('K', '')
-            line=line.replace('W', '')
-            line=line.replace('h', '')
-            line=line.replace('k', '')
-            line=line.replace('H', '')
-            line=line.replace('z', '')
-            line=line.replace('%', '')
-            line=line.replace(' ', '')
             l.append(line)
 	    
       if len(l) != 20:
-          print "Repsonse from Goodwe does not contain all data: " + str(l)
+          print "Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l)
 	  
       return l
+
+   #--------------------------------------------------------------------------
+   def _convert_line_to_float( self, line):
+      try:
+	 line=line.replace('A', '')
+	 line=line.replace('V', '')
+	 line=line.replace('K', '')
+	 line=line.replace('W', '')
+	 line=line.replace('h', '')
+	 line=line.replace('k', '')
+	 line=line.replace('H', '')
+	 line=line.replace('z', '')
+	 line=line.replace('%', '')
+	 line=line.replace(' ', '')
+      except(ValueError):
+         return 0.0
    
+      return float(line)
+
 
    #--------------------------------------------------------------------------
    def to_short_string( self):
