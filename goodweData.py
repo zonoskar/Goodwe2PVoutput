@@ -70,34 +70,29 @@ class goodweData :
 
       #multi line values, separated by '/'
       v = filteredData[8].split('/')
-      if len(v) != 2:
-         print "filteredData[8] does not contain all data: " + str(filteredData[8])
-      for frac in range(len(v)):
-         self.m_vpv[frac] = self._convert_line_to_float(v[frac])
+      if len(v) == 2:
+         for frac in range(len(v)):
+            self.m_vpv[frac] = self._convert_line_to_float(v[frac])
 
       i = filteredData[9].split('/')
-      if len(i) != 2:
-         print "filteredData[9] does not contain all data: " + str(filteredData[9])
-      for frac in range(len(i)):
-         self.m_ipv[frac] = self._convert_line_to_float(i[frac])
+      if len(i) == 2:
+         for frac in range(len(i)):
+            self.m_ipv[frac] = self._convert_line_to_float(i[frac])
 
       v = filteredData[10].split('/')
-      if len(v) != 3:
-         print "filteredData[10] does not contain all data: " + str(filteredData[10])
-      for frac in range(len(v)):
-         self.m_vac[frac] = self._convert_line_to_float(v[frac])
+      if len(v) == 3:
+         for frac in range(len(v)):
+            self.m_vac[frac] = self._convert_line_to_float(v[frac])
 
       i = filteredData[11].split('/')
-      if len(i) != 3:
-         print "filteredData[11] does not contain all data: " + str(filteredData[11])
-      for frac in range(len(i)):
-         self.m_iac[frac] = self._convert_line_to_float(i[frac])
+      if len(i) == 3:
+         for frac in range(len(i)):
+            self.m_iac[frac] = self._convert_line_to_float(i[frac])
 
       f = filteredData[12].split('/')
-      if len(f) != 3:
-         print "filteredData[12] does not contain all data: " + str(filteredData[12])
-      for frac in range(len(f)):
-         self.m_fac[frac] = self._convert_line_to_float(f[frac])
+      if len(f) == 3:
+         for frac in range(len(f)):
+            self.m_fac[frac] = self._convert_line_to_float(f[frac])
 
       self.m_consume_day = self._convert_line_to_float(filteredData[18])
       self.m_consume_total = self._convert_line_to_float(filteredData[19])
@@ -117,6 +112,9 @@ class goodweData :
    #URL data and strip all units from the data strings ready to be 
    #converted to float or integers.
    #
+#      print "######## START ########"
+#      print response
+#      print "########  END  ########"
       # Select from the HTTP data the table row with DG_Item
       table = response[response.find('id="tab_big"'):]
       table = table[table.find('<tr>')+5:]
@@ -130,7 +128,8 @@ class goodweData :
       for line in r:
          if '</td>' in line:
             line=line.replace('</td>', '')
-            line=line.replace('\r\n', '')
+            line=line.replace('\n', '')
+            line=line.replace('\r', '')
             l.append(line)
 	    
       if len(l) != 20:
@@ -140,6 +139,7 @@ class goodweData :
 
    #--------------------------------------------------------------------------
    def _convert_line_to_float( self, line):
+      retval = 0.0
       try:
 	 line=line.replace('A', '')
 	 line=line.replace('V', '')
@@ -151,10 +151,13 @@ class goodweData :
 	 line=line.replace('z', '')
 	 line=line.replace('%', '')
 	 line=line.replace(' ', '')
+         retval = float(line)
       except(ValueError):
-         return 0.0
-   
-      return float(line)
+	 retval = 0.0
+	 return retval
+
+      return retval
+    
 
 
    #--------------------------------------------------------------------------

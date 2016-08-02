@@ -5,8 +5,12 @@ import copy
 class test:
    
    def do_tests( self):
+      print "test_1"
       self.test_1()
-      
+      print "test_2"
+      self.test_2()
+      print "test_3"
+      self.test_3()
       
    def test_1( self):
       gw1 = goodweData.goodweData('id="tab_big"><tr></tr><tr class=\"DG_Item\"><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0/1.0<c/td><td>1.0/1.0</td><td>1.0/1.0</td><td>1.0/1.0/1.0</td><td>1.0/1.0/1.0</td><td>1.0/1.0/1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0</td><td>1.0/1.0/1.0</td><td>1.0</td><td>1.0</td></tr>')
@@ -92,6 +96,21 @@ class test:
       print "State:" + process.state_to_string()
       process.reset()
       print "State:" + process.state_to_string()
+
+
+   def test_2( self):
+      with open('OfflineResponse.html', 'r') as f:
+         response = f.read()
+      
+      gw1 = goodweData.goodweData(response)
+
+
+   def test_3( self):
+      with open('OnlineResponse.html', 'r') as f:
+         response = f.read()
+      
+      gw1 = goodweData.goodweData(response)
+
 
 if __name__ == "__main__":
    t = test()
