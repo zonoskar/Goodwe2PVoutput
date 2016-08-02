@@ -66,7 +66,7 @@ class goodweData :
       self.m_etotal = self._convert_line_to_float(filteredData[5])
       self.m_htotal = self._convert_line_to_float(filteredData[6])
       # Only select 1 significant digit after .
-      self.m_temperature = float(filteredData[13][0:filteredData[13].find('.')+2])
+      self.m_temperature = self._convert_line_to_float(filteredData[13][0:filteredData[13].find('.')+2])
 
       #multi line values, separated by '/'
       v = filteredData[8].split('/')
