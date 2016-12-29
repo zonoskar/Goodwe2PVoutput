@@ -34,7 +34,7 @@ def mainloop( goodwe, pvoutput, csv):
                interval = 20.0*60
                csv.reset()
 	       process.reset()
-	 
+
       # Wait for the next sample
       print "sleep " + str(interval) + " seconds before next sample"
       time.sleep(interval)
@@ -54,10 +54,12 @@ if __name__ == "__main__":
    pvoutput = pvoutput.pvoutput( config.get_pvoutput_url(), config.get_pvoutput_system_id(), config.get_pvoutput_api())
    csv = csvoutput.csvoutput( config.get_csv_dir(), 'Goodwe_PV_data')
    process = processData.processData( pvoutput)
-   
+
    # Request password for Goodwe-power.com
-   passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
-   password = getpass.getpass( passwd_text)
+   password = config.get_goodwe_password()
+   if password is None:
+       passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
+       password = getpass.getpass( passwd_text)
    goodwe.login( config.get_goodwe_user_id(), password)
 
    # Perform main loop
