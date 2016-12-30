@@ -8,6 +8,7 @@ import time
 import getpass
 import os
 import logging
+import argparse
 
 def mainloop( goodwe, process, csv):
 # Main processing loop
@@ -47,7 +48,17 @@ if __name__ == "__main__":
 # objects needed and sets the URL and system IDs. These are read from the
 # config file in ${HOME}/.goodwe2pvoutput
 #
-   logging.basicConfig(format='%(levelname)8s:%(message)s', level=logging.DEBUG)
+
+   # Parse command line arguments
+   parser = argparse.ArgumentParser(description="Upload Goodwe power invertor data to PVOutput.org")
+   parser.add_argument("--log", "-l", help="set log level", default="debug")
+   args = parser.parse_args()
+
+   # Configure the logging
+   numeric_level = getattr(logging, args.log.upper(), None)
+   if not isinstance(numeric_level, int):
+      raise ValueError('Invalid log level: %s' % loglevel)
+   logging.basicConfig(format='%(levelname)8s:%(message)s', level=numeric_level)
 
    home = os.environ['HOME']
    config = goodweConfig.goodweConfig(home+'/.goodwe2pvoutput')
