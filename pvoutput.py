@@ -51,7 +51,7 @@ class pvoutput :
       logging.debug(str(post))
       try:
          r = requests.post(self.m_url, headers=header, data=post, timeout=20)
-      except Exception, arg:
+      except Exception as arg:
          logging.error("POST data Error: " + str(arg))
 
 

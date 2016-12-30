@@ -30,9 +30,9 @@ class csvoutput :
             if self.m_write_header:
                fs.write( pvout.get_csv_header() + '\n')
                # next time, no need for a header
-	       self.m_write_header = False
+               self.m_write_header = False
             fs.write( dateString + pvout.to_csv_string() + '\n')
-      except Exception, arg:
+      except Exception as arg:
          logging.error("Write CSV data Error: " + str(arg))
 
 

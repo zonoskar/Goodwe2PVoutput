@@ -39,11 +39,11 @@ class goodweData:
 
       try:
          filteredData = self.filter_data( urlData)
-      except Exception, arg:
+      except Exception as arg:
          logging.error("Filter data Error: " + str(arg))
       try:
          self.parse_data( filteredData)
-      except Exception, arg:
+      except Exception as arg:
          logging.error("Parse data Error: " + str(arg))
 
    #--------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class goodweData:
          ppv = ((self.m_vpv[0] * self.m_ipv[0]) + (self.m_vpv[1] * self.m_ipv[1]))
          if ppv > 0.0:
             self.m_efficiency = self.m_pgrid / ppv
-      except Exception, arg:
+      except Exception as arg:
          logging.error("Calculate Efficiency Error: " + str(arg))
 
 
@@ -142,20 +142,20 @@ class goodweData:
    def _convert_line_to_float( self, line):
       retval = 0.0
       try:
-	 line=line.replace('A', '')
-	 line=line.replace('V', '')
-	 line=line.replace('K', '')
-	 line=line.replace('W', '')
-	 line=line.replace('h', '')
-	 line=line.replace('k', '')
-	 line=line.replace('H', '')
-	 line=line.replace('z', '')
-	 line=line.replace('%', '')
-	 line=line.replace(' ', '')
+         line=line.replace('A', '')
+         line=line.replace('V', '')
+         line=line.replace('K', '')
+         line=line.replace('W', '')
+         line=line.replace('h', '')
+         line=line.replace('k', '')
+         line=line.replace('H', '')
+         line=line.replace('z', '')
+         line=line.replace('%', '')
+         line=line.replace(' ', '')
          retval = float(line)
       except(ValueError):
-	 retval = 0.0
-	 return retval
+         retval = 0.0
+         return retval
 
       return retval
 

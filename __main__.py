@@ -1,9 +1,9 @@
-import readGoodwe
-import goodweConfig
-import goodweData
-import pvoutput
-import csvoutput
-import processData
+from Goodwe2PVoutput import readGoodwe
+from Goodwe2PVoutput import goodweConfig
+from Goodwe2PVoutput import goodweData
+from Goodwe2PVoutput import pvoutput
+from Goodwe2PVoutput import csvoutput
+from Goodwe2PVoutput import processData
 import time
 import getpass
 import os
@@ -18,12 +18,12 @@ def mainloop( goodwe, process, csv):
       interval = 4 * 60
       try: # Read Goodwe data from goodwe-power.com
          r = goodwe.read_data()
-      except Exception, arg:
+      except Exception as arg:
          logging.warning("Read data Error: " + str(arg))
       else:
          try: # Convert the URL data to usable data oject
             gw = goodweData.goodweData( r)
-         except Exception, arg:
+         except Exception as arg:
             logging.warning("Convert data Error: " + str(arg))
          else:
             if gw.is_online():
