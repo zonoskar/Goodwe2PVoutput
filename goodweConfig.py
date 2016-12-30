@@ -23,23 +23,26 @@ class goodweConfig :
       with open( configFile) as fp:
          for line in fp:
             line = line[:line.find('#')]
-            line = line.replace(' ', '')
-            line = line.replace('=', '')
-            line = line.replace(':', '')
-            line = line.replace('\'', '')
+            fields = line.split(":", 2)
+            if len(fields) < 2:
+               continue
+            key = fields[0].strip()
+            value = fields[1].strip()
+            if value.startswith("'") and value.endswith("'"):
+               value = value[1:-1]
 
-            if self.GOODWE_SYSTEM_ID in line:
-               self.goodwe_system_id = line.replace(self.GOODWE_SYSTEM_ID, '')
-            if self.GOODWE_USER_ID in line:
-               self.goodwe_user_id = line.replace(self.GOODWE_USER_ID, '')
-            if self.GOODWE_PASSWORD in line:
-               self.goodwe_password = line.replace(self.GOODWE_PASSWORD, '')
-            if self.PVOUTPUT_SYSTEM_ID in line:
-               self.pvoutput_system_id = line.replace(self.PVOUTPUT_SYSTEM_ID, '')
-            if self.PVOUTPUT_API in line:
-               self.pvoutput_api = line.replace(self.PVOUTPUT_API, '')
-            if self.CSV_DIR in line:
-               self.csv_dir = line.replace(self.CSV_DIR, '')
+            if self.GOODWE_SYSTEM_ID == key:
+               self.goodwe_system_id = value
+            if self.GOODWE_USER_ID == key:
+               self.goodwe_user_id = value
+            if self.GOODWE_PASSWORD == key:
+               self.goodwe_password = value
+            if self.PVOUTPUT_SYSTEM_ID == key:
+               self.pvoutput_system_id = value
+            if self.PVOUTPUT_API == key:
+               self.pvoutput_api = value
+            if self.CSV_DIR == key:
+               self.csv_dir = value
 
 
    #--------------------------------------------------------------------------
@@ -50,7 +53,7 @@ class goodweConfig :
       logging.debug("Goodwe status URL: " + self.goodwe_url)
       logging.debug(self.GOODWE_SYSTEM_ID + ": " + self.goodwe_system_id)
       logging.debug(self.GOODWE_USER_ID + ": " + self.goodwe_user_id)
-      if self.goodwe_password:
+      if self.goodwe_password is not None:
           logging.debug(self.GOODWE_PASSWORD + ": ********")
       logging.debug("PVOutput upload URL: " + self.pvoutput_url)
       logging.debug(self.PVOUTPUT_SYSTEM_ID + ": " + self.pvoutput_system_id)
