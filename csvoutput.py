@@ -1,5 +1,6 @@
+import logging
 import time
-  
+
 class csvoutput :
 
    #--------------------------------------------------------------------------
@@ -14,7 +15,7 @@ class csvoutput :
       self.m_filename = dirname + filename
       self.m_write_header = True
 
-      
+
    #--------------------------------------------------------------------------
    def write_data( self, pvout):
    # Writes the Goodwe inverted data to a CSV file. The filename is based on
@@ -32,8 +33,8 @@ class csvoutput :
 	       self.m_write_header = False
             fs.write( dateString + pvout.to_csv_string() + '\n')
       except Exception, arg:
-         print "Write CSV data Error: " + str(arg)
-     
+         logging.error("Write CSV data Error: " + str(arg))
+
 
    #--------------------------------------------------------------------------
    def reset( self):

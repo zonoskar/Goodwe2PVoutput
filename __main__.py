@@ -7,22 +7,23 @@ import processData
 import time
 import getpass
 import os
+import logging
 
 def mainloop( goodwe, process, csv):
 # Main processing loop
 #
    # Do for ever.
    while True:
-      interval = 4.0*60
+      interval = 4 * 60
       try: # Read Goodwe data from goodwe-power.com
          r = goodwe.read_data()
       except Exception, arg:
-         print "Read data Error: " + str(arg)
+         logging.warning("Read data Error: " + str(arg))
       else:
          try: # Convert the URL data to usable data oject
             gw = goodweData.goodweData( r)
          except Exception, arg:
-            print "Convert data Error: " + str(arg)
+            logging.warning("Convert data Error: " + str(arg))
          else:
             if gw.is_online():
                # write CSV file
@@ -30,13 +31,13 @@ def mainloop( goodwe, process, csv):
                process.processSample( gw)
             else:
                # Wait for the inverter to come online
-               print "Inverter is not online: " + gw.to_string()
-               interval = 20.0*60
+               logging.info("Inverter is not online: " + gw.to_string())
+               interval = 20 * 60
                csv.reset()
                process.reset()
 
       # Wait for the next sample
-      print "sleep " + str(interval) + " seconds before next sample"
+      logging.debug("sleep " + str(interval) + " seconds before next sample")
       time.sleep(interval)
 
 
@@ -46,6 +47,8 @@ if __name__ == "__main__":
 # objects needed and sets the URL and system IDs. These are read from the
 # config file in ${HOME}/.goodwe2pvoutput
 #
+   logging.basicConfig(format='%(levelname)8s:%(message)s', level=logging.DEBUG)
+
    home = os.environ['HOME']
    config = goodweConfig.goodweConfig(home+'/.goodwe2pvoutput')
    config.to_string()

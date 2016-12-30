@@ -1,3 +1,4 @@
+import logging
 import requests
 
 class readGoodwe :
@@ -24,12 +25,12 @@ class readGoodwe :
       with requests.Session() as self.m_session:
          p = self.m_session.post( self.m_login_url, data=payload)
          if p.status_code != 200:
-            print "Cannot Log in " + str(self.m_login_url)
+            logging.warning("Cannot Log in " + str(self.m_login_url))
             raise IOError
          if 'incorrect' in p.text:
-            print "Incorrect password for user " + str(username)
+            logging.warning("Incorrect password for user " + str(username))
             raise IOError
-         print "User " + str(username) + " Logged in"
+         logging.debug("User " + str(username) + " Logged in")
 
 
    #--------------------------------------------------------------------------
@@ -47,7 +48,7 @@ class readGoodwe :
          except:
             tries += 1
             if tries > 3:
-               print "Cannot read data after " + str(tries) + " tries."
+               logging.warning("Cannot read data after " + str(tries) + " tries.")
                raise ValueError
 
 

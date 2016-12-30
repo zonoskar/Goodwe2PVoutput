@@ -1,5 +1,6 @@
-  
-class goodweData :
+import logging
+
+class goodweData:
 
    #--------------------------------------------------------------------------
    def __init__( self, urlData):
@@ -35,15 +36,15 @@ class goodweData :
       self.m_consume_day = 0.0
       self.m_consume_total = 0.0
       self.m_efficiency = 0.0
-      
+
       try:
          filteredData = self.filter_data( urlData)
       except Exception, arg:
-         print "Filter data Error: " + str(arg)
+         logging.error("Filter data Error: " + str(arg))
       try:
          self.parse_data( filteredData)
       except Exception, arg:
-         print "Parse data Error: " + str(arg)
+         logging.error("Parse data Error: " + str(arg))
 
    #--------------------------------------------------------------------------
    def parse_data( self, filteredData):
@@ -103,13 +104,13 @@ class goodweData :
          if ppv > 0.0:
             self.m_efficiency = self.m_pgrid / ppv
       except Exception, arg:
-         print "Calculate Efficiency Error: " + str(arg)
+         logging.error("Calculate Efficiency Error: " + str(arg))
 
 
    #--------------------------------------------------------------------------
    def filter_data( self, response):
-   #Filters the URL data. This will select the correct table from the 
-   #URL data and strip all units from the data strings ready to be 
+   #Filters the URL data. This will select the correct table from the
+   #URL data and strip all units from the data strings ready to be
    #converted to float or integers.
    #
 #      print "######## START ########"
@@ -131,10 +132,10 @@ class goodweData :
             line=line.replace('\n', '')
             line=line.replace('\r', '')
             l.append(line)
-	    
+
       if len(l) != 20:
-          print "Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l)
-	  
+          logging.warning("Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l))
+
       return l
 
    #--------------------------------------------------------------------------
@@ -157,7 +158,7 @@ class goodweData :
 	 return retval
 
       return retval
-    
+
 
 
    #--------------------------------------------------------------------------
@@ -193,7 +194,7 @@ class goodweData :
    #TRUE when the GoodWe inverter returns the correct status
    #
       return ((self.m_inverter_status == 'Normal') and (abs(self.m_vpv[0]+self.m_vpv[1]) > 0.01))
-      
+
 
    #--------------------------------------------------------------------------
    def is_identical( self, gw):
@@ -203,7 +204,7 @@ class goodweData :
       eps = 0.05
       if not gw:
          return False
-         
+
       if (abs(self.m_vpv[0] - gw.m_vpv[0]) < eps) and \
          (abs(self.m_vpv[1] - gw.m_vpv[1]) < eps) and \
          (abs(self.m_ipv[0] - gw.m_ipv[0]) < eps) and \
@@ -219,17 +220,17 @@ class goodweData :
          (abs(self.m_fac[1] - gw.m_fac[1]) < eps) and \
          (abs(self.m_fac[2] - gw.m_fac[2]) < eps) :
          return True
-         
-      return False      
+
+      return False
 
 
    #--------------------------------------------------------------------------
    def interpolate( self, gw):
-   #Interpolates two goodweData class instances by using linear 
+   #Interpolates two goodweData class instances by using linear
    #interpolation. This will yield a nicer graph in PVoutput.org
    #
       igw = gw
-      
+
       igw.m_vpv[0] = (self.m_vpv[0] + gw.m_vpv[0]) / 2
       igw.m_vpv[1] = (self.m_vpv[1] + gw.m_vpv[1]) / 2
       igw.m_ipv[0] = (self.m_ipv[0] + gw.m_ipv[0]) / 2
@@ -249,13 +250,13 @@ class goodweData :
       igw.m_htotal = (self.m_htotal + gw.m_htotal) / 2
       igw.m_temperature = (self.m_temperature + gw.m_temperature) / 2
       igw.m_efficiency = (self.m_efficiency + gw.m_efficiency) / 2
-      
+
       return igw
-      
-      
-      
-      
-   
-   
-   
-   
+
+
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+import logging
+
 class goodweConfig :
    GOODWE_SYSTEM_ID = 'goodwe_system_id'
    GOODWE_USER_ID = 'goodwe_user_id'
@@ -20,40 +22,40 @@ class goodweConfig :
 
       with open( configFile) as fp:
          for line in fp:
-	    line = line[:line.find('#')]
-	    line = line.replace(' ', '')
-	    line = line.replace('=', '')
-	    line = line.replace(':', '')
-	    line = line.replace('\'', '')
+            line = line[:line.find('#')]
+            line = line.replace(' ', '')
+            line = line.replace('=', '')
+            line = line.replace(':', '')
+            line = line.replace('\'', '')
 
-	    if self.GOODWE_SYSTEM_ID in line:
-	       self.goodwe_system_id = line.replace(self.GOODWE_SYSTEM_ID, '')
-	    if self.GOODWE_USER_ID in line:
-	       self.goodwe_user_id = line.replace(self.GOODWE_USER_ID, '')
-	    if self.GOODWE_PASSWORD in line:
-	       self.goodwe_password = line.replace(self.GOODWE_PASSWORD, '')
-	    if self.PVOUTPUT_SYSTEM_ID in line:
-	       self.pvoutput_system_id = line.replace(self.PVOUTPUT_SYSTEM_ID, '')
-	    if self.PVOUTPUT_API in line:
-	       self.pvoutput_api = line.replace(self.PVOUTPUT_API, '')
-	    if self.CSV_DIR in line:
-	       self.csv_dir = line.replace(self.CSV_DIR, '')
+            if self.GOODWE_SYSTEM_ID in line:
+               self.goodwe_system_id = line.replace(self.GOODWE_SYSTEM_ID, '')
+            if self.GOODWE_USER_ID in line:
+               self.goodwe_user_id = line.replace(self.GOODWE_USER_ID, '')
+            if self.GOODWE_PASSWORD in line:
+               self.goodwe_password = line.replace(self.GOODWE_PASSWORD, '')
+            if self.PVOUTPUT_SYSTEM_ID in line:
+               self.pvoutput_system_id = line.replace(self.PVOUTPUT_SYSTEM_ID, '')
+            if self.PVOUTPUT_API in line:
+               self.pvoutput_api = line.replace(self.PVOUTPUT_API, '')
+            if self.CSV_DIR in line:
+               self.csv_dir = line.replace(self.CSV_DIR, '')
 
 
    #--------------------------------------------------------------------------
    def to_string( self):
    # Prints a string representation fo the class
    #
-      print "Goodwe URL: (" + self.goodwe_url + ")"
-      print "Goodwe Login URL: (" + self.goodwe_loginUrl + ")"
-      print self.GOODWE_SYSTEM_ID + ": (" + self.goodwe_system_id + ")"
-      print self.GOODWE_USER_ID + ": (" + self.goodwe_user_id + ")"
+      logging.debug("Goodwe login URL: " + self.goodwe_loginUrl)
+      logging.debug("Goodwe status URL: " + self.goodwe_url)
+      logging.debug(self.GOODWE_SYSTEM_ID + ": " + self.goodwe_system_id)
+      logging.debug(self.GOODWE_USER_ID + ": " + self.goodwe_user_id)
       if self.goodwe_password:
-          print self.GOODWE_PASSWORD + ": (********)"
-      print "PVOutput upload URL: (" + self.pvoutput_url + ")"
-      print self.PVOUTPUT_SYSTEM_ID + ": (" + self.pvoutput_system_id + ")"
-      print self.PVOUTPUT_API + ": (" + self.pvoutput_api + ")"
-      print self.CSV_DIR + ": (" + self.csv_dir + ")"
+          logging.debug(self.GOODWE_PASSWORD + ": ********")
+      logging.debug("PVOutput upload URL: " + self.pvoutput_url)
+      logging.debug(self.PVOUTPUT_SYSTEM_ID + ": " + self.pvoutput_system_id)
+      logging.debug(self.PVOUTPUT_API + ": " + self.pvoutput_api)
+      logging.debug(self.CSV_DIR + ": " + self.csv_dir)
 
 
    #--------------------------------------------------------------------------
