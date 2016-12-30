@@ -1,11 +1,12 @@
+import logging
 import time
-  
+
 class csvoutput :
 
    #--------------------------------------------------------------------------
    def __init__( self, dirname, filename):
    # This class provides an interface to a CSV fiel output of the measured
-   # Goodwe inverter data
+   # GoodWe inverter data
    #
       if dirname[:-1] != '/':
          dirname += '/'
@@ -14,10 +15,10 @@ class csvoutput :
       self.m_filename = dirname + filename
       self.m_write_header = True
 
-      
+
    #--------------------------------------------------------------------------
    def write_data( self, pvout):
-   # Writes the Goodwe inverted data to a CSV file. The filename is based on
+   # Writes the GoodWe inverted data to a CSV file. The filename is based on
    # the current date and time. When a header is not written, this is done.
    #
       t = time.localtime()
@@ -29,11 +30,11 @@ class csvoutput :
             if self.m_write_header:
                fs.write( pvout.get_csv_header() + '\n')
                # next time, no need for a header
-	       self.m_write_header = False
+               self.m_write_header = False
             fs.write( dateString + pvout.to_csv_string() + '\n')
-      except Exception, arg:
-         print "Write CSV data Error: " + str(arg)
-     
+      except Exception as arg:
+         logging.error("Write CSV data Error: " + str(arg))
+
 
    #--------------------------------------------------------------------------
    def reset( self):

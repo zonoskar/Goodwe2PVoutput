@@ -1,3 +1,4 @@
+import logging
 
 class processData :
    BUFFERING = 'BUFFERING'
@@ -7,26 +8,26 @@ class processData :
 
    #--------------------------------------------------------------------------
    def __init__( self, pvoutput):
-   # Processing class. This class converts the data from the Goodwe logging
-   # frequency of once every 10 min, to the log interval of 5 min of PVoutput
+   # Processing class. This class converts the data from the GoodWe logging
+   # frequency of once every 10 min, to the log interval of 5 min of PVOutput
    # by interpolating.
    #
       self.m_switch = {self.BUFFERING:     self.buffering,
                        self.LOG_PREV_SAME: self.logging,
                        self.LOG_PREV_DIFF: self.logging,
                        self.INTERPOLATE:   self.interpolate}
-      self.m_state = self.BUFFERING                      
+      self.m_state = self.BUFFERING
       self.m_prev_gw = None
       self.m_pvoutput = pvoutput
-      
-      
+
+
    #--------------------------------------------------------------------------
    def state_to_string( self):
    # Converts the state to a string
    #
       return self.m_state
-      
-      
+
+
    #--------------------------------------------------------------------------
    def update_state( self, gw):
    # Updates the state.
@@ -49,16 +50,16 @@ class processData :
    #
       if self.m_pvoutput:
          self.m_pvoutput.post_data( self.m_prev_gw)
-      print "Logging: " + self.m_prev_gw.to_short_string()
-      
-      
+      logging.info("Logging: " + self.m_prev_gw.to_short_string())
+
+
    #--------------------------------------------------------------------------
    def buffering( self, gw):
    # Processes the BUFFERING state. Basically does nothing.
    #
-      print "Buffering: " + gw.to_short_string()
-      
-      
+      logging.info("Buffering: " + gw.to_short_string())
+
+
    #--------------------------------------------------------------------------
    def interpolate( self, gw):
    # Interpolates the current and the previous sample by using linear interpolation.
@@ -66,22 +67,22 @@ class processData :
       gw1 = gw.interpolate( self.m_prev_gw)
       if self.m_pvoutput:
          self.m_pvoutput.post_data( gw1)
-      print "Interpolate: " + gw1.to_short_string()
+      logging.info("Interpolate: " + gw1.to_short_string())
       self.m_state = self.LOG_PREV_DIFF
 
-      
+
    #--------------------------------------------------------------------------
    def reset( self):
    # Resets the processing class when the inverter goes offline and logs the
    # last sample.
    #
-      # Flush the last dat apoint to PVoutput
+      # Flush the last dat apoint to PVOutput
       if self.m_prev_gw:
          self.logging( self.m_prev_gw)
-      self.m_state = self.BUFFERING 
+      self.m_state = self.BUFFERING
       self.m_prev_gw = None
-   
-   
+
+
    #--------------------------------------------------------------------------
    def processSample( self, gw):
    # This method processes the sample by calling the method associated with the
@@ -89,6 +90,6 @@ class processData :
    #
       self.update_state( gw)
       self.m_switch[self.m_state](gw)
-      
+
       self.m_prev_gw = gw
 
