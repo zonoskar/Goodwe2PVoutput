@@ -58,5 +58,5 @@ class readGoodwe :
    #
       if self.m_session:
          r = self.m_session.get( url, timeout=20)
-      return r.content
+      return r.text
 

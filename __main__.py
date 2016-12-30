@@ -19,12 +19,12 @@ def mainloop( goodwe, process, csv):
       try: # Read GoodWe data from goodwe-power.com
          r = goodwe.read_data()
       except Exception as arg:
-         logging.warning("Read data Error: " + str(arg))
+         logging.warning("Read data error: " + str(arg))
       else:
          try: # Convert the URL data to usable data oject
-            gw = goodweData.goodweData( r)
+            gw = goodweData.goodweData(r)
          except Exception as arg:
-            logging.warning("Convert data Error: " + str(arg))
+            logging.warning("Convert data error: " + str(arg))
          else:
             if gw.is_online():
                # write CSV file

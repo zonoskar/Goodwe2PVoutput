@@ -38,13 +38,13 @@ class goodweData:
       self.m_efficiency = 0.0
 
       try:
-         filteredData = self.filter_data( urlData)
+         filteredData = self.filter_data(urlData)
       except Exception as arg:
-         logging.error("Filter data Error: " + str(arg))
+         logging.error("Filter data error: " + str(arg))
       try:
          self.parse_data( filteredData)
       except Exception as arg:
-         logging.error("Parse data Error: " + str(arg))
+         logging.error("Parse data error: " + str(arg))
 
    #--------------------------------------------------------------------------
    def parse_data( self, filteredData):
@@ -104,18 +104,15 @@ class goodweData:
          if ppv > 0.0:
             self.m_efficiency = self.m_pgrid / ppv
       except Exception as arg:
-         logging.error("Calculate Efficiency Error: " + str(arg))
+         logging.error("Calculate efficiency error: " + str(arg))
 
 
    #--------------------------------------------------------------------------
-   def filter_data( self, response):
+   def filter_data(self, response):
    #Filters the URL data. This will select the correct table from the
    #URL data and strip all units from the data strings ready to be
    #converted to float or integers.
    #
-#      print "######## START ########"
-#      print response
-#      print "########  END  ########"
       # Select from the HTTP data the table row with DG_Item
       table = response[response.find('id="tab_big"'):]
       table = table[table.find('<tr>')+5:]
