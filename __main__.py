@@ -8,7 +8,7 @@ import time
 import getpass
 import os
 
-def mainloop( goodwe, pvoutput, csv):
+def mainloop( goodwe, process, csv):
 # Main processing loop
 #
    # Do for ever.
@@ -33,7 +33,7 @@ def mainloop( goodwe, pvoutput, csv):
                print "Inverter is not online: " + gw.to_string()
                interval = 20.0*60
                csv.reset()
-	       process.reset()
+               process.reset()
 
       # Wait for the next sample
       print "sleep " + str(interval) + " seconds before next sample"
@@ -63,4 +63,4 @@ if __name__ == "__main__":
    goodwe.login( config.get_goodwe_user_id(), password)
 
    # Perform main loop
-   mainloop( goodwe, pvoutput, csv)
+   mainloop( goodwe, process, csv)
