@@ -1,5 +1,5 @@
 # Goodwe2PVOutput
-Script to upload Goodwe power invertor data to [PVOutput](PVOutput.org) website. 
+Script to upload GoodWe power invertor data to [PVOutput](PVOutput.org) website.
 
 ## Extended data
 
@@ -23,7 +23,7 @@ Extract zip file to a directory named Goodwe2PVoutput (this is later used with t
 Create a configuration file named `.goodwe2pvoutput` in your home directory indicated by the `$HOME` environment variable. This file must contain the following information (replace text between '' by your information, the order is not important):
 
 ```
-goodwe_system_id:   'Your Goodwe system ID'
+goodwe_system_id:   'Your GoodWe system ID'
 goodwe_user_id:     'Your username on goodwe-power.com'
 goodwe_password:    'Your password on goodwe-power.com'
 pvoutput_system_id: 'Your PVOutput system ID'
@@ -46,7 +46,7 @@ In case you want to run the script as a Systemd service, you can use the followi
 
 ```
 [Unit]
-Description=Read Goodwe invertor and upload data to PVOutput
+Description=Read GoodWe invertor and upload data to PVOutput
 
 [Service]
 Environment="PYTHONPATH=DIR"

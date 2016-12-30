@@ -16,7 +16,7 @@ def mainloop( goodwe, process, csv):
    # Do for ever.
    while True:
       interval = 4 * 60
-      try: # Read Goodwe data from goodwe-power.com
+      try: # Read GoodWe data from goodwe-power.com
          r = goodwe.read_data()
       except Exception as arg:
          logging.warning("Read data Error: " + str(arg))
@@ -44,13 +44,13 @@ def mainloop( goodwe, process, csv):
 
 
 if __name__ == "__main__":
-# Main entry point for the Goodwe to PVoutput logging script. Creates the
+# Main entry point for the GoodWe to PVOutput logging script. Creates the
 # objects needed and sets the URL and system IDs. These are read from the
 # config file in ${HOME}/.goodwe2pvoutput
 #
 
    # Parse command line arguments
-   parser = argparse.ArgumentParser(description="Upload Goodwe power invertor data to PVOutput.org")
+   parser = argparse.ArgumentParser(description="Upload GoodWe power invertor data to PVOutput.org")
    parser.add_argument("--log", "-l", help="set log level", default="debug")
    args = parser.parse_args()
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
    numeric_level = getattr(logging, args.log.upper(), None)
    if not isinstance(numeric_level, int):
       raise ValueError('Invalid log level: %s' % loglevel)
-   logging.basicConfig(format='%(levelname)8s:%(message)s', level=numeric_level)
+   logging.basicConfig(format='%(levelname)-8s %(message)s', level=numeric_level)
 
    home = os.environ['HOME']
    config = goodweConfig.goodweConfig(home+'/.goodwe2pvoutput')
@@ -69,7 +69,7 @@ if __name__ == "__main__":
    csv = csvoutput.csvoutput( config.get_csv_dir(), 'Goodwe_PV_data')
    process = processData.processData( pvoutput)
 
-   # Request password for Goodwe-power.com
+   # Request password for goodwe-power.com
    password = config.get_goodwe_password()
    if password is None:
        passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
@@ -77,4 +77,4 @@ if __name__ == "__main__":
    goodwe.login( config.get_goodwe_user_id(), password)
 
    # Perform main loop
-   mainloop( goodwe, process, csv)
+   mainloop(goodwe, process, csv)

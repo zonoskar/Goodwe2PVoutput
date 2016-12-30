@@ -6,7 +6,7 @@ class pvoutput :
 
    #--------------------------------------------------------------------------
    def __init__( self, url, system_id, api_key):
-   # PVoutput logging class. This class logs the inverter data to PVoutput
+   # PVOutput logging class. This class logs the inverter data to PVOutput
    # using the supplied URL, API key and system ID.
    #
       self.m_url = url
@@ -15,8 +15,8 @@ class pvoutput :
 
    #--------------------------------------------------------------------------
    def post_data( self, gw):
-   # Post the inverter data to PVoutput. The eday value from Goodwe-power.com
-   # is in kWh, but PVoutput.org wants this value in Wh, so it is multiplied
+   # Post the inverter data to PVOutput. The eday value from GoodWe-power.com
+   # is in kWh, but PVOutput.org wants this value in Wh, so it is multiplied
    # by 1000.
    #
 
@@ -40,7 +40,7 @@ class pvoutput :
               't' : str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2),
               'v1' : str(gw.m_eday*1000),
               'v2' : str(gw.m_pgrid),
-#               'v5' : str(gw.m_temperature),   # Goodwe reports panel temperature, PVOutput expects environmental temperature
+#               'v5' : str(gw.m_temperature),   # GoodWe reports panel temperature, PVOutput expects environmental temperature
               'v6' : str(gw.m_vpv[0] + gw.m_vpv[1]),
               'v7' : str(gw.m_vpv[0]),
               'v8' : str(gw.m_vpv[1]),

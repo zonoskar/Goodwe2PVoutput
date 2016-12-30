@@ -6,7 +6,7 @@ class csvoutput :
    #--------------------------------------------------------------------------
    def __init__( self, dirname, filename):
    # This class provides an interface to a CSV fiel output of the measured
-   # Goodwe inverter data
+   # GoodWe inverter data
    #
       if dirname[:-1] != '/':
          dirname += '/'
@@ -18,7 +18,7 @@ class csvoutput :
 
    #--------------------------------------------------------------------------
    def write_data( self, pvout):
-   # Writes the Goodwe inverted data to a CSV file. The filename is based on
+   # Writes the GoodWe inverted data to a CSV file. The filename is based on
    # the current date and time. When a header is not written, this is done.
    #
       t = time.localtime()

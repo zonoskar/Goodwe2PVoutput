@@ -5,7 +5,7 @@ class readGoodwe :
 
    #--------------------------------------------------------------------------
    def __init__(self, url, login_url, station_id):
-   # Goodwe-power reading class. Reads the Goodwe-power.com website
+   # GoodWe-power reading class. Reads the goodwe-power.com website
    # from the specified URL and station ID.
    #
       self.m_goodwe_url = url
@@ -16,7 +16,7 @@ class readGoodwe :
 
    #--------------------------------------------------------------------------
    def login(self, username, password):
-   # Log in Goodwe-power web site.
+   # Log in GoodWe-power web site.
    #
       payload = {
          'username': username,

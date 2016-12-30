@@ -8,8 +8,8 @@ class processData :
 
    #--------------------------------------------------------------------------
    def __init__( self, pvoutput):
-   # Processing class. This class converts the data from the Goodwe logging
-   # frequency of once every 10 min, to the log interval of 5 min of PVoutput
+   # Processing class. This class converts the data from the GoodWe logging
+   # frequency of once every 10 min, to the log interval of 5 min of PVOutput
    # by interpolating.
    #
       self.m_switch = {self.BUFFERING:     self.buffering,
@@ -76,7 +76,7 @@ class processData :
    # Resets the processing class when the inverter goes offline and logs the
    # last sample.
    #
-      # Flush the last dat apoint to PVoutput
+      # Flush the last dat apoint to PVOutput
       if self.m_prev_gw:
          self.logging( self.m_prev_gw)
       self.m_state = self.BUFFERING

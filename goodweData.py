@@ -134,7 +134,7 @@ class goodweData:
             l.append(line)
 
       if len(l) != 20:
-          logging.warning("Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l))
+          logging.warning("Response from GoodWe does not contain all data (len=" + str(len(l)) + ") : " + str(l))
 
       return l
 
@@ -227,7 +227,7 @@ class goodweData:
    #--------------------------------------------------------------------------
    def interpolate( self, gw):
    #Interpolates two goodweData class instances by using linear
-   #interpolation. This will yield a nicer graph in PVoutput.org
+   #interpolation. This will yield a nicer graph in PVOutput.org
    #
       igw = gw
 

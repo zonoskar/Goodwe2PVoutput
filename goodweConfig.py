@@ -13,8 +13,8 @@ class goodweConfig :
    # Initialization of the goodweConfig class. This class read the config
    # file and stores these.
 
-      # These URLs should be okay for Goodwe-power and PVoutput.org (and yes,
-      # there is a spelling error in the goodwe URL).
+      # These URLs should be okay for GoodWe-power and PVOutput.org (and yes,
+      # there is a spelling error in the GoodWe URL).
       self.goodwe_url = 'http://goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail'
       self.goodwe_loginUrl = 'http://goodwe-power.com/User/Login'
       self.goodwe_password = None
@@ -49,9 +49,9 @@ class goodweConfig :
    def to_string( self):
    # Prints a string representation fo the class
    #
-      logging.debug("Goodwe login URL: " + self.goodwe_loginUrl)
-      logging.debug("Goodwe status URL: " + self.goodwe_url)
-      logging.debug(self.GOODWE_SYSTEM_ID + ": " + self.goodwe_system_id)
+      logging.debug("GoodWe login URL: " + self.goodwe_loginUrl)
+      logging.debug("GoodWe status URL: " + self.goodwe_url)
+      logging.debug("GoodWe system ID: " + self.goodwe_system_id)
       logging.debug(self.GOODWE_USER_ID + ": " + self.goodwe_user_id)
       if self.goodwe_password is not None:
           logging.debug(self.GOODWE_PASSWORD + ": ********")
