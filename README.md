@@ -33,6 +33,8 @@ pvoutput_api: 'Your PVOutput API key'
 
 csv_dir: 'Path where the CSV files are stored'
 
+spline_fit: 'True or False. When True, the new spline fit smooths the data sent to PVoutput'
+
 The character '#' can be used to denote comments, from this character to the
 end of the line will be ignored. An example is provided in the data direcotry.
 
