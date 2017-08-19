@@ -4,11 +4,12 @@ import goodweData
 import pvoutput
 import csvoutput
 import processData
+import processData2
 import time
 import getpass
 import os
 
-def mainloop( goodwe, pvoutput, csv):
+def mainloop( goodwe, pvoutput, csv, process):
 # Main processing loop
 #
    # Do for ever.
@@ -31,7 +32,7 @@ def mainloop( goodwe, pvoutput, csv):
             else:
                # Wait for the inverter to come online
                print "Inverter is not online: " + gw.to_string()
-               interval = 20.0*60
+               interval = 10.0*60
                csv.reset()
 	       process.reset()
 	 
@@ -53,12 +54,15 @@ if __name__ == "__main__":
    goodwe = readGoodwe.readGoodwe( config.get_goodwe_url(), config.get_goodwe_loginUrl(), config.get_goodwe_system_id())
    pvoutput = pvoutput.pvoutput( config.get_pvoutput_url(), config.get_pvoutput_system_id(), config.get_pvoutput_api())
    csv = csvoutput.csvoutput( config.get_csv_dir(), 'Goodwe_PV_data')
-   process = processData.processData( pvoutput)
-   
+   if config.get_spline_fit():
+      process = processData2.processData2( pvoutput)
+   else:
+      process = processData.processData( pvoutput)
+      
    # Request password for Goodwe-power.com
    passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
    password = getpass.getpass( passwd_text)
    goodwe.login( config.get_goodwe_user_id(), password)
 
    # Perform main loop
-   mainloop( goodwe, pvoutput, csv)
+   mainloop( goodwe, pvoutput, csv, process)

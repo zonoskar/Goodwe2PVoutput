@@ -7,6 +7,7 @@ class readGoodwe :
    # Goodwe-power reading class. Reads the Goodwe-power.com website
    # from the specified URL and station ID.
    #
+      self.m_query = "&InventerType=GridInventer&HaveAdverseCurrentData=0&HaveEnvironmentData=0"
       self.m_goodwe_url = url
       self.m_login_url = login_url
       self.m_station_id = station_id
@@ -39,12 +40,13 @@ class readGoodwe :
    # Read the data. When a failure is found, it is tried upto 3 times. After 
    # that, an error is logged.
    #
-      url = self.m_goodwe_url + "?ID=" + self.m_station_id
+      url = self.m_goodwe_url + "?ID=" + self.m_station_id + self.m_query
       tries = 0
       
       while True:
          try:
             r = self._read_data( url)
+#	    print r
             return r
          except:
             tries += 1

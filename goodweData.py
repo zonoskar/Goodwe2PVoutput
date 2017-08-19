@@ -38,6 +38,7 @@ class goodweData :
       
       try:
          filteredData = self.filter_data( urlData)
+#	 print filteredData
       except Exception, arg:
          print "Filter data Error: " + str(arg)
       try:
@@ -112,10 +113,8 @@ class goodweData :
    #URL data and strip all units from the data strings ready to be 
    #converted to float or integers.
    #
-#      print "######## START ########"
-#      print response
-#      print "########  END  ########"
       # Select from the HTTP data the table row with DG_Item
+      title = response[response.find('<title>')+7:response.find('</title>')]
       table = response[response.find('id="tab_big"'):]
       table = table[table.find('<tr>')+5:]
       table = table[table.find('<tr>')+5:]
@@ -133,6 +132,7 @@ class goodweData :
             l.append(line)
 	    
       if len(l) != 20:
+          print title
           print "Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l)
 	  
       return l
@@ -208,7 +208,7 @@ class goodweData :
          (abs(self.m_vpv[1] - gw.m_vpv[1]) < eps) and \
          (abs(self.m_ipv[0] - gw.m_ipv[0]) < eps) and \
          (abs(self.m_ipv[1] - gw.m_ipv[1]) < eps) and \
-         (abs(self.m_pgrid - gw.m_pgrid) < eps) and \
+         (abs(self.m_pgrid  - gw.m_pgrid)  < eps) and \
          (abs(self.m_vac[0] - gw.m_vac[0]) < eps) and \
          (abs(self.m_vac[1] - gw.m_vac[1]) < eps) and \
          (abs(self.m_vac[2] - gw.m_vac[2]) < eps) and \
@@ -252,9 +252,44 @@ class goodweData :
       
       return igw
       
-      
-      
-      
+   def get_vpv0( gw):
+      return gw.m_vpv[0]
+   def get_vpv1( gw):
+      return gw.m_vpv[1]
+   def get_ipv0( gw):
+      return gw.m_ipv[0]
+   def get_ipv1( gw):
+      return gw.m_ipv[1]
+   def get_vac0( gw):
+      return gw.m_vac[0]
+   def get_vac1( gw):
+      return gw.m_vac[1]
+   def get_vac2( gw):
+      return gw.m_vac[2]
+   def get_iac0( gw):
+      return gw.m_iac[0]
+   def get_iac1( gw):
+      return gw.m_iac[1]
+   def get_iac2( gw):
+      return gw.m_iac[2]
+   def get_fac0( gw):
+      return gw.m_fac[0]
+   def get_fac1( gw):
+      return gw.m_fac[1]
+   def get_fac2( gw):
+      return gw.m_fac[2]
+   def get_pgrid( gw):
+      return gw.m_pgrid
+   def get_eday( gw):
+      return gw.m_eday
+   def get_etotal( gw):
+      return gw.m_etotal
+   def get_htotal( gw):
+      return gw.m_htotal
+   def get_temperature( gw):
+      return gw.m_temperature
+   def get_efficiency( gw):
+      return gw.m_efficiency
    
    
    

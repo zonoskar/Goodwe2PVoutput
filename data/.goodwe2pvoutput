@@ -4,3 +4,4 @@ goodwe_user_id: # Goodwe User ID
 pvoutput_system_id: # PVoutput SystemID
 pvoutput_api: # PVoutput API key
 csv_dir: # Directory on your system where the CSV file can be written. Make sure it's writable.
+spline_fit: True # Or False if you want to keep the old data.
