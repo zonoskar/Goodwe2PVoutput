@@ -16,7 +16,8 @@ class goodweConfig :
       self.goodwe_url = 'http://goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail'
       self.goodwe_loginUrl = 'http://goodwe-power.com/User/Login'
       self.pvoutput_url = 'http://pvoutput.org/service/r2/addstatus.jsp'
-
+      self.spline_fit = False
+      
       with open( configFile) as fp:
          for line in fp:
 	    line = line[:line.find('#')]
