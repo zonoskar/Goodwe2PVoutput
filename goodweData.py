@@ -7,6 +7,7 @@ class goodweData :
    #to default values. Then the urlData is filtered and parsed
       self.m_line = ''
       self.m_inverter_sn = ''
+      self.m_description = ''
       self.m_inverter_status = ''
       self.m_error = ''
       self.m_vbattery = ''
@@ -54,49 +55,50 @@ class goodweData :
       self.m_line = filteredData[0]
       self.m_inverter_status = filteredData[1]
       self.m_inverter_sn = filteredData[2]
-      self.m_error = filteredData[7]
+      self.m_description = filteredData[3]
+      self.m_error = filteredData[8]
 
       #Values that I'm not using (or don't know what they are
-      self.m_vbattery = filteredData[14].replace(' ', '') # 0.0/0.0V
-      self.m_ibattery = filteredData[15].replace(' ', '') # 0.0/0.0A
-      self.m_soc = filteredData[16].replace(' ', '') # 0/0%
-      self.m_load = filteredData[17].replace(' ', '') # 0.0V/0.0A/0.000KW
+      self.m_vbattery = filteredData[15].replace(' ', '') # 0.0/0.0V
+      self.m_ibattery = filteredData[16].replace(' ', '') # 0.0/0.0A
+      self.m_soc = filteredData[17].replace(' ', '') # 0/0%
+      self.m_load = filteredData[18].replace(' ', '') # 0.0V/0.0A/0.000KW
 
-      self.m_pgrid = self._convert_line_to_float(filteredData[3])
-      self.m_eday = self._convert_line_to_float(filteredData[4])
-      self.m_etotal = self._convert_line_to_float(filteredData[5])
-      self.m_htotal = self._convert_line_to_float(filteredData[6])
+      self.m_pgrid = self._convert_line_to_float(filteredData[4])
+      self.m_eday = self._convert_line_to_float(filteredData[5])
+      self.m_etotal = self._convert_line_to_float(filteredData[6])
+      self.m_htotal = self._convert_line_to_float(filteredData[7])
       # Only select 1 significant digit after .
-      self.m_temperature = self._convert_line_to_float(filteredData[13][0:filteredData[13].find('.')+2])
+      self.m_temperature = self._convert_line_to_float(filteredData[14][0:filteredData[14].find('.')+2])
 
       #multi line values, separated by '/'
-      v = filteredData[8].split('/')
+      v = filteredData[9].split('/')
       if len(v) == 2:
          for frac in range(len(v)):
             self.m_vpv[frac] = self._convert_line_to_float(v[frac])
 
-      i = filteredData[9].split('/')
+      i = filteredData[10].split('/')
       if len(i) == 2:
          for frac in range(len(i)):
             self.m_ipv[frac] = self._convert_line_to_float(i[frac])
 
-      v = filteredData[10].split('/')
+      v = filteredData[11].split('/')
       if len(v) == 3:
          for frac in range(len(v)):
             self.m_vac[frac] = self._convert_line_to_float(v[frac])
 
-      i = filteredData[11].split('/')
+      i = filteredData[12].split('/')
       if len(i) == 3:
          for frac in range(len(i)):
             self.m_iac[frac] = self._convert_line_to_float(i[frac])
 
-      f = filteredData[12].split('/')
+      f = filteredData[13].split('/')
       if len(f) == 3:
          for frac in range(len(f)):
             self.m_fac[frac] = self._convert_line_to_float(f[frac])
 
-      self.m_consume_day = self._convert_line_to_float(filteredData[18])
-      self.m_consume_total = self._convert_line_to_float(filteredData[19])
+      self.m_consume_day = self._convert_line_to_float(filteredData[19])
+      self.m_consume_total = self._convert_line_to_float(filteredData[20])
 
       # Calculate efficiency (PowerAC / powerDC)
       try:
@@ -178,7 +180,7 @@ class goodweData :
    def to_csv_string( self):
    #Creates a string repesentation of the class, separated by ','.
    #
-      return str(self.m_line) + ", " + str(self.m_inverter_sn) + ", " + str(self.m_inverter_status) + ", " + str(self.m_pgrid) + ", " + str(self.m_eday) + ", " + str(self.m_etotal) + ", " + str(self.m_htotal) + ", " + str(self.m_error) + ", " + str(self.m_vpv[0]) + ", " + str(self.m_vpv[1]) + ", " + str(self.m_ipv[0]) + ", " + str(self.m_ipv[1]) + ", " + str(self.m_vac[0]) + ", " + str(self.m_vac[1]) + ", " + str(self.m_vac[2]) + ", " + str(self.m_iac[0]) + ", " + str(self.m_iac[1]) + ", " + str(self.m_iac[2]) + ", " + str(self.m_fac[0]) + ", " + str(self.m_fac[1]) + ", " + str(self.m_fac[2]) + ", " + str(self.m_temperature) + ", " + str(self.m_consume_day) + ", " + str(self.m_consume_total) + ", " + str(self.m_efficiency)
+      return str(self.m_line) + ", " + str(self.m_inverter_sn) + ", " + str(self.m_description) + ", " + str(self.m_inverter_status) + ", " + str(self.m_pgrid) + ", " + str(self.m_eday) + ", " + str(self.m_etotal) + ", " + str(self.m_htotal) + ", " + str(self.m_error) + ", " + str(self.m_vpv[0]) + ", " + str(self.m_vpv[1]) + ", " + str(self.m_ipv[0]) + ", " + str(self.m_ipv[1]) + ", " + str(self.m_vac[0]) + ", " + str(self.m_vac[1]) + ", " + str(self.m_vac[2]) + ", " + str(self.m_iac[0]) + ", " + str(self.m_iac[1]) + ", " + str(self.m_iac[2]) + ", " + str(self.m_fac[0]) + ", " + str(self.m_fac[1]) + ", " + str(self.m_fac[2]) + ", " + str(self.m_temperature) + ", " + str(self.m_consume_day) + ", " + str(self.m_consume_total) + ", " + str(self.m_efficiency)
 
 
    #--------------------------------------------------------------------------
