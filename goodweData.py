@@ -133,7 +133,7 @@ class goodweData :
             line=line.replace('\r', '')
             l.append(line)
 	    
-      if len(l) != 20:
+      if len(l) != 21:
           print title
           print "Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l)
 	  
