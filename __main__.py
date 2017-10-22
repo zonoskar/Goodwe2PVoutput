@@ -18,8 +18,10 @@ def mainloop( goodwe, pvoutput, csv, process):
    while True:
       interval = 4.0*60
       try: # Read Goodwe data from goodwe-power.com
+         goodwe.initialize()
          gw = goodwe.read_sample_data()
       except Exception, arg:
+         interval = 10.0*60
          print "Read data Error: " + str(arg)
       else:
          if gw.is_online():
@@ -71,6 +73,7 @@ if __name__ == "__main__":
       goodwe = goodweUsb.goodweUsb( 0x0084)
       try:
          goodwe.usb_init()
+         print "USB connection initialized"
       except Exception, ex:
          print ex
          print "Connect USB cable to the inverter please or wait until the inverter is online"

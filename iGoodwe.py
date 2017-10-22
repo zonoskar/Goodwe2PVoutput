@@ -6,7 +6,7 @@ class iGoodwe :
       pass      
 
    #--------------------------------------------------------------------------
-   def initialize(self, args):
+   def initialize(self):
       '''initialize'''
       pass
 

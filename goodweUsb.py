@@ -284,22 +284,24 @@ class goodweUsb( iGoodwe.iGoodwe) :
          data = self._read_data_goodwe()
          self._convert_data( data)
       except Exception, ex:
-         print ex
+         raise IOError( "Cannot read from GoodweUSB" + str(ex))
+	 self.m_sample.set_online( 'Offline')
 
       return self.m_sample
 
 
    #--------------------------------------------------------------------------
-   def initialize( self, device_id):
-      try:
-         self.m_initialized = False
-         serial = self._send_init_goodwe_msg()
-         sn = self._send_ack_goodwe_msg( serial)
-      except Exception, ex:
-         print ex
-      else:
-         self.m_sample.set_inverter_sn( sn)
-         self.m_initialized = True
+   def initialize( self):
+      if not self.m_initialized:
+         try:
+            self.m_initialized = False
+            serial = self._send_init_goodwe_msg()
+            sn = self._send_ack_goodwe_msg( serial)
+         except Exception, ex:
+            raise IOError( "Cannot initialize Goodwe inverter")
+         else:
+            self.m_sample.set_inverter_sn( sn)
+            self.m_initialized = True
 
 
    #--------------------------------------------------------------------------
