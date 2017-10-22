@@ -67,7 +67,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       if self.m_dev is None:
          raise ValueError('Device for vendor GoodWe (vendor ID %s) not found' % str(vendor))
    
-      if self.m_dev.is_kernel_driver_active(0) is True:
+      if self.m_dev.is_kernel_driver_active(0):
          print "but we need to detach kernel driver."
          self.m_dev.detach_kernel_driver(0)
          print "claiming device."
@@ -88,6 +88,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       cfg = self.m_dev.get_active_configuration()
    
       intf = cfg[(0, 0)]
+      print intf
    
       # get the BULK IN descriptor
       self.m_epi = usb.util.find_descriptor(
