@@ -10,15 +10,16 @@ import iGoodwe
 class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
-   def __init__( self, urlData):
+   def __init__( self, deviceId):
    #Initialisation of the goodweUsb class. All data members are set
    #to default values. 
-      self.m_sample = goodweSample()
+      self.m_sample = goodweSample.goodweSample()
       self.m_received_buffer=''
       self.m_received_last_pos=0
       self.m_dev = None
       self.m_epi = None
       self.m_initialized = False
+      self.m_deviceId = deviceId
         
       self.init_message =''.join(chr(x) for x in [0xCC,0x99,0x09,0xAA,0x55,0x80,0x7F,0x00,
                                                   0x00,0x00,0x01,0xFE,0x00,0x00,0x00,0x00,
@@ -58,9 +59,9 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
 
    #--------------------------------------------------------------------------
-   def usb_init( self, vendor):
+   def usb_init( self):
       '''This initialises the USB device'''
-      self.m_dev = usb.core.find(idVendor = vendor)
+      self.m_dev = usb.core.find(idVendor = self.m_deviceId)
       self.m_dev.reset()
    
       if self.m_dev is None:
@@ -137,19 +138,19 @@ class goodweUsb( iGoodwe.iGoodwe) :
       se=buffer.find(self.data_start, ss+1, len(buffer))
 
       if ss != -1:
-         if self.received_last_pos == 0:
+         if self.m_received_last_pos == 0:
             if se == -1:
-               self.received_buffer=buffer[ss:]
-               self.received_last_pos = len(self.received_buffer)
+               self.m_received_buffer=buffer[ss:]
+               self.m_received_last_pos = len(self.m_received_buffer)
                incomplete = True
             else:
-               self.received_buffer=buffer[ss:se]
+               self.m_received_buffer=buffer[ss:se]
          else:
-            self.received_buffer += buffer[:ss]
+            self.m_received_buffer += buffer[:ss]
       else:
-         if self.received_last_pos != 0:
-            self.received_buffer += buffer
-            self.received_last_pos = len(self.received_buffer)
+         if self.m_received_last_pos != 0:
+            self.m_received_buffer += buffer
+            self.m_received_last_pos = len(self.m_received_buffer)
          incomplete = True
    
       return incomplete
@@ -165,7 +166,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
             for d in dat:
                receive += chr(d)
       except Exception as ex:
-         print "Error reading: " + str(ex)
+         raise IOError( "Error reading: " + str(ex))
 
       return receive
 
@@ -178,7 +179,10 @@ class goodweUsb( iGoodwe.iGoodwe) :
       if lenn != 72:
          print 'received length ' + str(lenn) + ' is not 72.'
 
-      received_buffer = self._goodwe_receive( 8*8)
+      try:
+         received_buffer = self._goodwe_receive( 8*8)
+      except Exception, ex:
+         raise IOError( "Unable to init Goodwe USB" + str(ex))
 
       # extract serial number
       ss = received_buffer.find(self.init_reply) + len(self.init_reply)
@@ -193,8 +197,11 @@ class goodweUsb( iGoodwe.iGoodwe) :
       crc=''.join(chr(x) for x in self._crc16(buffer, 28))
       buffer=self._update_message( buffer, crc, 27)
 
-      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, buffer)
-      received_buffer = self._goodwe_receive( 8*8)
+      try:
+         lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, buffer)
+         received_buffer = self._goodwe_receive( 8*8)
+      except Exception, ex:
+         raise IOError( "Unable to send Goodwe USB acknowledge" + str(ex))
 
       ss = received_buffer.find(self.ack_reply) + len(self.ack_reply)
       
@@ -208,10 +215,14 @@ class goodweUsb( iGoodwe.iGoodwe) :
       while more:
          lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, self.data_message)
 #         print "Transferred " + str(lenn) + " bytes for read_data."
-         received = self._goodwe_receive( 9*8)
-         more = self._assemble_buffer( g, received)
+         try:
+            received = self._goodwe_receive( 9*8)
+         except Exception, ex:
+            raise IOError( "Unable to read from Goodwe USB " + str(ex))
+         else:
+            more = self._assemble_buffer( received)
  
-      return self.received_buffer
+      return self.m_received_buffer
 
 
    #--------------------------------------------------------------------------
@@ -251,7 +262,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_sample.set_etotal( self._scale_data( indata, base+36, 4,  10.0))
       self.m_sample.set_htotal( self._scale_data( indata, base+40, 4,   1.0))
       self.m_sample.set_eday(   self._scale_data( indata, base+64, 2,  10.0))
-      self.m_sample.set_error( indata[base+73:base+77] 
+      self.m_sample.set_error( indata[base+73:base+77])
       try:
          self.m_sample.set_eff( self.m_sample.get_pgrid() / ((self.m_sample.get_vpv(0) * self.m_sample.get_ipv(0)) + (self.m_sample.get_vpv(1) * self.m_sample.get_ipv(1))))
       except:
@@ -296,3 +307,6 @@ class goodweUsb( iGoodwe.iGoodwe) :
       terminate_usb()
 
 
+   #--------------------------------------------------------------------------
+   def is_online( self):
+     return self.initialized

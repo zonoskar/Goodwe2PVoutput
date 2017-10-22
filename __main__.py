@@ -1,9 +1,11 @@
 import readGoodwe
 import goodweConfig
 import goodweData
+import goodweUsb
 import pvoutput
 import csvoutput
 import processData
+import processNone
 import processData2
 import time
 import getpass
@@ -66,9 +68,9 @@ if __name__ == "__main__":
          process = processData.processData( pvoutput)
       
    if config.get_input_source() == 'USB':
-      goodwe = goodweUsb.goodweUsb()
+      goodwe = goodweUsb.goodweUsb( 0x0084)
       try:
-         goodwe.usb_init( 0x0084)
+         goodwe.usb_init()
       except Exception, ex:
          print ex
          print "Connect USB cable to the inverter please or wait until the inverter is online"
