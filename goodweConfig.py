@@ -126,3 +126,5 @@ class goodweConfig :
    # Returns the input_source
    #
       return self.input_source
+
+#---------------- End of file ------------------------------------------------

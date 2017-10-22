@@ -68,21 +68,23 @@ class goodweUsb( iGoodwe.iGoodwe) :
          raise ValueError('Device for vendor GoodWe (vendor ID %s) not found' % str(vendor))
    
       if self.m_dev.is_kernel_driver_active(0) is True:
-         print "but we need to detach kernel driver"
+         print "but we need to detach kernel driver."
          self.m_dev.detach_kernel_driver(0)
-   
-         print "claiming device"
+         print "claiming device."
    
       try:
+         print "Setting default USB configuration."
          self.m_dev.set_configuration()
       except:
          raise ValueError('Error setting USB configuration')
    
       try:
+         print "Claiming USB interface."
          usb.util.claim_interface( self.m_dev, 0)
       except:
          raise ValueError('Error claiming USB interface')
    
+      print "Getting active USB configuration."
       cfg = self.m_dev.get_active_configuration()
    
       intf = cfg[(0, 0)]
@@ -284,8 +286,8 @@ class goodweUsb( iGoodwe.iGoodwe) :
          data = self._read_data_goodwe()
          self._convert_data( data)
       except Exception, ex:
-         raise IOError( "Cannot read from GoodweUSB" + str(ex))
 	 self.m_sample.set_online( 'Offline')
+         raise IOError( "Cannot read from GoodweUSB" + str(ex))
 
       return self.m_sample
 
@@ -309,6 +311,4 @@ class goodweUsb( iGoodwe.iGoodwe) :
       terminate_usb()
 
 
-   #--------------------------------------------------------------------------
-   def is_online( self):
-     return self.initialized
+#---------------- End of file ------------------------------------------------

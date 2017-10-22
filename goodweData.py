@@ -247,3 +247,4 @@ class goodweData :
       return self.m_sample.to_short_string()
    
    
+#---------------- End of file ------------------------------------------------

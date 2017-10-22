@@ -82,3 +82,6 @@ if __name__ == "__main__":
 
    # Perform main loop
    mainloop( goodwe, pvoutput, csv, process)
+
+
+#---------------- End of file ------------------------------------------------

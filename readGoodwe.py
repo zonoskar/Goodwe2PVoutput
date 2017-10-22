@@ -65,3 +65,4 @@ class readGoodwe( iGoodwe.iGoodwe) :
          r = self.m_session.get( url, timeout=20)
       return r.content
                   
+#---------------- End of file ------------------------------------------------
