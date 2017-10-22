@@ -7,7 +7,7 @@ import zlib
 import goodweSample
 import iGoodwe
   
-class goodweUsb( iGoodwe) :
+class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def __init__( self, urlData):
@@ -75,12 +75,12 @@ class goodweUsb( iGoodwe) :
       try:
          self.m_dev.set_configuration()
       except:
-         raise ValueError(‘Error setting USB configuration’)
+         raise ValueError('Error setting USB configuration')
    
       try:
          usb.util.claim_interface( self.m_dev, 0)
       except:
-         raise ValueError(‘Error claiming USB interface’)
+         raise ValueError('Error claiming USB interface')
    
       cfg = self.m_dev.get_active_configuration()
    
@@ -102,7 +102,7 @@ class goodweUsb( iGoodwe) :
       usb.util.dispose_resources( self.m_dev)
       self.m_dev = None
       self.m_epi = None
-      self.m_sample.set_online( ‘Offline’)
+      self.m_sample.set_online( 'Offline')
       self.m_initialized = False
 
 
@@ -176,7 +176,7 @@ class goodweUsb( iGoodwe) :
 
       lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, self.init_message)
       if lenn != 72:
-         print “received length ” + str(lenn) + “ is not 72.”
+         print 'received length ' + str(lenn) + ' is not 72.'
 
       received_buffer = self._goodwe_receive( 8*8)
 
@@ -243,9 +243,9 @@ class goodweUsb( iGoodwe) :
       self.m_sample.set_pgrid( self._scale_data( indata, base+26, 2,   1.0))
 
       if self._scale_data( indata, base+28, 2,   1.0) > 0.0:
-         self.m_sample.set_online( ‘Normal’)
+         self.m_sample.set_online( 'Normal')
       else:
-         self.m_sample.set_online( ‘Offline’)
+         self.m_sample.set_online( 'Offline')
 
       self.m_sample.set_temperature( self._scale_data( indata, base+30, 2,  10.0))
       self.m_sample.set_etotal( self._scale_data( indata, base+36, 4,  10.0))
@@ -264,7 +264,7 @@ class goodweUsb( iGoodwe) :
       self.m_sample.set_ibattery(0.0)
       self.m_sample.set_soc(0.0)
       self.m_sample.set_load(0.0)
-      self.m_sample.set_description(“”)
+      self.m_sample.set_description('')
 
 
    #--------------------------------------------------------------------------

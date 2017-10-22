@@ -7,12 +7,12 @@ class iGoodwe :
 
    #--------------------------------------------------------------------------
    def initialize(self, args):
-      ‘’’initialize’’’
+      '''initialize'''
       pass
 
    #--------------------------------------------------------------------------
    def read_sample_data( self):
-      ‘’’Read a data sample.’’’
+      '''Read a data sample.'''
       return None         
       
                   

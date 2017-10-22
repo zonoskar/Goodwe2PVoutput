@@ -47,7 +47,7 @@ class pvoutput :
 	      'v10' : str(p2),
 	      'v11' : str(vac),
 	      'v12' : str(gw.m_efficiency)}
-      print str(post)
+#      print str(post)
       try:
          r = requests.post(self.m_url, headers=header, data=post, timeout=20)
          print r

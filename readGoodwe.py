@@ -2,7 +2,7 @@ import requests
 import goodweData
 import iGoodwe
 
-class readGoodwe( iGoodwe) :
+class readGoodwe( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def __init__(self, url, login_url, station_id):

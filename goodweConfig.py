@@ -5,7 +5,7 @@ class goodweConfig :
    PVOUTPUT_API = 'pvoutput_api'
    CSV_DIR = 'csv_dir'
    SPLINE_FIT = 'spline_fit'
-   INPUT_SOURCE = ‘input_source’
+   INPUT_SOURCE = 'input_source'
 
    #--------------------------------------------------------------------------
    def __init__( self, configFile):

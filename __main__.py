@@ -51,7 +51,7 @@ if __name__ == "__main__":
                                  config.get_pvoutput_api())
    csv = csvoutput.csvoutput( config.get_csv_dir(), 'Goodwe_PV_data')
 
-   if config.get_input_source() == ‘URL’:
+   if config.get_input_source() == 'URL':
       goodwe = readGoodwe.readGoodwe( config.get_goodwe_url(), 
                                       config.get_goodwe_loginUrl(), 
                                       config.get_goodwe_system_id())
@@ -65,13 +65,13 @@ if __name__ == "__main__":
       else:
          process = processData.processData( pvoutput)
       
-   if config.get_input_source() == ‘USB’:
+   if config.get_input_source() == 'USB':
       goodwe = goodweUsb.goodweUsb()
       try:
          goodwe.usb_init( 0x0084)
       except Exception, ex:
          print ex
-         print “Connect USB cable to the inverter please or wait until the inverter is online”
+         print "Connect USB cable to the inverter please or wait until the inverter is online"
 
       process = processNone.processNone( pvoutput)
 

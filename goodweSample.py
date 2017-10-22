@@ -1,8 +1,8 @@
   
-class goodweData :
+class goodweSample :
 
    #--------------------------------------------------------------------------
-   def __init__( self, urlData):
+   def __init__( self):
    #Initialization of the goodweData class. All data members are set
    #to default values. Then the urlData is filtered and parsed
       self.m_line = ''
@@ -86,7 +86,12 @@ class goodweData :
          
       return False      
 
-     
+
+   #--------------------------------------------------------------------------
+   def is_inverter_status( self, status):
+       return status == self.m_inverter_status
+
+             
    #--------------------------------------------------------------------------
    def get_vpv( self, i):
       return self.m_vpv[i]
@@ -120,6 +125,40 @@ class goodweData :
 
    def get_efficiency( self):
       return self.m_efficiency
+   
+   def get_line( self):
+      return self.m_line
+   
+   def get_inverter_status( self):
+      return self.m_inverter_status
+   
+   def get_inverter_sn( self):
+      return self.m_inverter_sn
+   
+   def get_description( self):
+      return self.m_description
+   
+   def get_error( self):
+      return self.m_error
+   
+   def get_vbattery( self):
+      return self.m_vbattery
+   
+   def get_ibattery( self):
+      return self.m_ibattery
+   
+   def get_soc( self):
+      return self.m_soc
+   
+   def get_load( self):
+      return self.m_load
+   
+   def get_consume_day( self):
+      return self.m_consume_day
+   
+   def get_consume_total( self):
+      return self.m_consume_total
+   
    
    
    #--------------------------------------------------------------------------
@@ -155,6 +194,39 @@ class goodweData :
 
    def set_efficiency( self, val):
       self.m_efficiency = val
+
+   def set_line( self, val):
+      self.m_line = val
+   
+   def set_inverter_status( self, val):
+      self.m_inverter_status = val
+   
+   def set_inverter_sn( self, val):
+      self.m_inverter_sn = val
+   
+   def set_description( self, val):
+      self.m_description = val
+   
+   def set_error( self, val):
+      self.m_error = val
+   
+   def set_vbattery( self, val):
+      self.m_vbattery = val
+   
+   def set_ibattery( self, val):
+      self.m_ibattery = val
+   
+   def set_soc( self, val):
+      self.m_soc = val
+   
+   def set_load( self, val):
+      self.m_load = val
+   
+   def set_consume_day( self, val):
+      self.m_consume_day = val
+   
+   def set_consume_total( self, val):
+      self.m_consume_total = val
    
    
    

@@ -6,11 +6,16 @@ class goodweData :
    def __init__( self, urlData):
    #Initialization of the goodweData class. All data members are set
    #to default values. Then the urlData is filtered and parsed
-      self.m_sample = goodweSample()
+      print "Test2"
+      try:
+         self.m_sample = goodweSample.goodweSample()
+      except Exception, ex: 
+         print "Error:" +str(ex)
+      print "Test"
       
       try:
          filteredData = self.filter_data( urlData)
-#	 print filteredData
+	 print filteredData
       except Exception, arg:
          print "Filter data Error: " + str(arg)
       try:
@@ -30,10 +35,10 @@ class goodweData :
       self.m_sample.set_error( filteredData[8])
 
       #Values that I'm not using (or don't know what they are
-      self.m_sample.set_vbattery( filteredData[15].replace(' ', ‘’))
-      self.m_sample.set_ibattery( filteredData[16].replace(' ', ‘’))
-      self.m_sample.set_soc( filteredData[17].replace(' ', ‘’))
-      self.m_sample.set_load( filteredData[18].replace(' ', ‘’))
+      self.m_sample.set_vbattery( filteredData[15].replace(' ', ''))
+      self.m_sample.set_ibattery( filteredData[16].replace(' ', ''))
+      self.m_sample.set_soc( filteredData[17].replace(' ', ''))
+      self.m_sample.set_load( filteredData[18].replace(' ', ''))
 
       self.m_sample.set_pgrid( self._convert_line_to_float(filteredData[4]))
       self.m_sample.set_eday( self._convert_line_to_float(filteredData[5]))
@@ -152,7 +157,7 @@ class goodweData :
    def is_online( self):
    #TRUE when the GoodWe inverter returns the correct status
    #
-      return ((self.m_sample.is_inverter_status('Normal’)) and (abs(self.m_sample.get_vpv(0)+self.m_sample.get_vpv(1)) > 0.01))
+      return ((self.m_sample.is_inverter_status('Normal')) and (abs(self.m_sample.get_vpv(0)+self.m_sample.get_vpv(1)) > 0.01))
       
 
    #--------------------------------------------------------------------------
@@ -170,29 +175,75 @@ class goodweData :
    #
       igw = gw
       
-      igw.set_vpv(0, (self.m_sample.get_vpv(0) + gw.get_vpv(0)) / 2
-      igw.set_vpv(1, (self.m_sample.get_vpv(1) + gw.get_vpv(1)) / 2
-      igw.set_ipv(0, (self.m_sample.get_ipv(0) + gw.get_ipv(0)) / 2
-      igw.set_ipv(1, (self.m_sample.get_ipv(1) + gw.get_ipv(1)) / 2
-      igw.set_vac(0, (self.m_sample.get_vac(0) + gw.get_vac(0)) / 2
-      igw.set_vac(1, (self.m_sample.get_vac(1) + gw.get_vac(1)) / 2
-      igw.set_vac(2, (self.m_sample.get_vac(2) + gw.get_vac(2)) / 2
-      igw.set_iac(0, (self.m_sample.get_iac(0) + gw.get_iac(0)) / 2
-      igw.set_iac(1, (self.m_sample.get_iac(1) + gw.get_iac(1)) / 2
-      igw.set_iac(2, (self.m_sample.get_iac(2) + gw.get_iac(2)) / 2
-      igw.set_fac(0, (self.m_sample.get_fac(0) + gw.get_fac(0)) / 2
-      igw.set_fac(1, (self.m_sample.get_fac(1) + gw.get_fac(1)) / 2
-      igw.set_fac(2, (self.m_sample.get_fac(2) + gw.get_fac(2)) / 2
-      igw.set_pgrid( (self.m_sample.get_pgrid() + gw.get_pgrid()) / 2
-      igw.set_eday( (self.m_sample.get_eday() + gw.get_eday()) / 2
-      igw.set_etotal( (self.m_sample.get_etotal() + gw.get_etotal()) / 2
-      igw.set_htotal( (self.m_sample.get_htotal() + gw.get_htotal()) / 2
-      igw.set_temperature( (self.m_sample.get_temperature() + gw.get_temperature()) / 2
-      igw.set_efficiency( (self.m_sample.get_efficiency() + gw.get_efficiency()) / 2
+      igw.set_vpv(0, (self.m_sample.get_vpv(0) + gw.get_vpv(0)) / 2)
+      igw.set_vpv(1, (self.m_sample.get_vpv(1) + gw.get_vpv(1)) / 2)
+      igw.set_ipv(0, (self.m_sample.get_ipv(0) + gw.get_ipv(0)) / 2)
+      igw.set_ipv(1, (self.m_sample.get_ipv(1) + gw.get_ipv(1)) / 2)
+      igw.set_vac(0, (self.m_sample.get_vac(0) + gw.get_vac(0)) / 2)
+      igw.set_vac(1, (self.m_sample.get_vac(1) + gw.get_vac(1)) / 2)
+      igw.set_vac(2, (self.m_sample.get_vac(2) + gw.get_vac(2)) / 2)
+      igw.set_iac(0, (self.m_sample.get_iac(0) + gw.get_iac(0)) / 2)
+      igw.set_iac(1, (self.m_sample.get_iac(1) + gw.get_iac(1)) / 2)
+      igw.set_iac(2, (self.m_sample.get_iac(2) + gw.get_iac(2)) / 2)
+      igw.set_fac(0, (self.m_sample.get_fac(0) + gw.get_fac(0)) / 2)
+      igw.set_fac(1, (self.m_sample.get_fac(1) + gw.get_fac(1)) / 2)
+      igw.set_fac(2, (self.m_sample.get_fac(2) + gw.get_fac(2)) / 2)
+      igw.set_pgrid( (self.m_sample.get_pgrid() + gw.get_pgrid()) / 2)
+      igw.set_eday( (self.m_sample.get_eday() + gw.get_eday()) / 2)
+      igw.set_etotal( (self.m_sample.get_etotal() + gw.get_etotal()) / 2)
+      igw.set_htotal( (self.m_sample.get_htotal() + gw.get_htotal()) / 2)
+      igw.set_temperature( (self.m_sample.get_temperature() + gw.get_temperature()) / 2)
+      igw.set_efficiency( (self.m_sample.get_efficiency() + gw.get_efficiency()) / 2)
       
       return igw
       
+
+   #--------------------------------------------------------------------------
+   def get_vpv0( self):
+      return self.m_sample.get_vpv(0)
+   def get_vpv1( self):
+      return self.m_sample.get_vpv(1)
+   def get_ipv0( self):
+      return self.m_sample.get_ipv(0)
+   def get_ipv1( self):
+      return self.m_sample.get_ipv(1)
+   def get_vac0( self):
+      return self.m_sample.get_vac(0)
+   def get_vac1( self):
+      return self.m_sample.get_vac(1)
+   def get_vac2( self):
+      return self.m_sample.get_vac(2)
+   def get_iac0( self):
+      return self.m_sample.get_iac(0)
+   def get_iac1( self):
+      return self.m_sample.get_iac(1)
+   def get_iac2( self):
+      return self.m_sample.get_iac(2)
+   def get_fac0( self):
+      return self.m_sample.get_fac(0)
+   def get_fac1( self):
+      return self.m_sample.get_fac(1)
+   def get_fac2( self):
+      return self.m_sample.get_fac(2)
+   def get_pgrid( self):
+      return self.m_sample.get_pgrid()
+   def get_eday( self):
+      return self.m_sample.get_eday()
+   def get_temperature( self):
+      return self.m_sample.get_temperature()
+   def get_etotal( self):
+      return self.m_sample.get_etotal()
+   def get_htotal( self):
+      return self.m_sample.get_htotal()
+   def get_efficiency( self):
+      return self.m_sample.get_efficiency()
+
+
+   #--------------------------------------------------------------------------
+   def to_string( self):
+      return self.m_sample.to_string()
    
-   
+   def to_short_string( self):
+      return self.m_sample.to_short_string()
    
    
