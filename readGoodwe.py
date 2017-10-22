@@ -1,6 +1,8 @@
 import requests
+import goodweData
+import iGoodwe
 
-class readGoodwe :
+class readGoodwe( iGoodwe) :
 
    #--------------------------------------------------------------------------
    def __init__(self, url, login_url, station_id):
@@ -36,7 +38,7 @@ class readGoodwe :
 	 
 
    #--------------------------------------------------------------------------
-   def read_data( self):
+   def read_sample_data( self):
    # Read the data. When a failure is found, it is tried upto 3 times. After 
    # that, an error is logged.
    #
@@ -45,14 +47,14 @@ class readGoodwe :
       
       while True:
          try:
-            r = self._read_data( url)
-#	    print r
-            return r
+            sample = self._read_data( url)
+            return goodweData.goodweData( sample)
          except:
             tries += 1
             if tries > 3:
                print "Cannot read data after " + str(tries) + " tries."
                raise ValueError
+
          
       
    #--------------------------------------------------------------------------

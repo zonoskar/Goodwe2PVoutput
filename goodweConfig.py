@@ -5,6 +5,7 @@ class goodweConfig :
    PVOUTPUT_API = 'pvoutput_api'
    CSV_DIR = 'csv_dir'
    SPLINE_FIT = 'spline_fit'
+   INPUT_SOURCE = ‘input_source’
 
    #--------------------------------------------------------------------------
    def __init__( self, configFile):
@@ -38,6 +39,8 @@ class goodweConfig :
 	       self.csv_dir = line.replace(self.CSV_DIR, '')
 	    if self.SPLINE_FIT in line:
                self.spline_fit = line.replace(self.SPLINE_FIT, '') == "True"
+	    if self.INPUT_SOURCE in line:
+               self.input_source = line.replace(self.INPUT_SOURCE, '')
 
    #--------------------------------------------------------------------------
    def to_string( self):
@@ -52,6 +55,7 @@ class goodweConfig :
       print self.PVOUTPUT_API + " (" + self.pvoutput_api + ")"
       print self.CSV_DIR + " (" + self.csv_dir + ")"
       print self.SPLINE_FIT + " (" + str(self.spline_fit) + ")"
+      print self.INPUT_SOURCE + " (" + str(self.input_source) + ")"
       
             
    #--------------------------------------------------------------------------
@@ -109,8 +113,16 @@ class goodweConfig :
    #
       return self.pvoutput_url
 
+
    #--------------------------------------------------------------------------
    def get_spline_fit( self):
    # Returns the pvoutput_url
    #
       return self.spline_fit
+
+
+   #--------------------------------------------------------------------------
+   def get_input_source( self):
+   # Returns the input_source
+   #
+      return self.input_source
