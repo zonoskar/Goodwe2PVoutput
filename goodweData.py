@@ -6,16 +6,13 @@ class goodweData :
    def __init__( self, urlData):
    #Initialization of the goodweData class. All data members are set
    #to default values. Then the urlData is filtered and parsed
-      print "Test2"
       try:
          self.m_sample = goodweSample.goodweSample()
       except Exception, ex: 
          print "Error:" +str(ex)
-      print "Test"
       
       try:
          filteredData = self.filter_data( urlData)
-	 print filteredData
       except Exception, arg:
          print "Filter data Error: " + str(arg)
       try:
