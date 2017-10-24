@@ -229,6 +229,9 @@ class goodweSample :
    def set_consume_total( self, val):
       self.m_consume_total = val
    
+   def set_inverter_sn( self, val):
+      self.m_inverter_sn = val
+   
    
    
    

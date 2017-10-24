@@ -21,7 +21,7 @@ def mainloop( goodwe, pvoutput, csv, process):
          goodwe.initialize()
          gw = goodwe.read_sample_data()
       except Exception, arg:
-         interval = 10.0*60
+         interval = 1.0*60
          print "Read data Error: " + str(arg)
       else:
          if gw.is_online():

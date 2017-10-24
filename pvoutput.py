@@ -20,12 +20,13 @@ class pvoutput :
    #
       
       # Extended parameters.
-      p1 = gw.m_vpv[0] * gw.m_ipv[0] * gw.m_efficiency
-      p2 = gw.m_vpv[1] * gw.m_ipv[1] * gw.m_efficiency
+      p1 = gw.get_vpv(0) * gw.get_ipv(0) * gw.get_efficiency()
+      p2 = gw.get_vpv(1) * gw.get_ipv(1) * gw.get_efficiency()
       vs = 0
       vac = 0
-      for v in gw.m_vac:
-         if v > 0:
+      for i in xrange(3):
+         v = gw.get_vac(i)
+         if vpv > 0:
 	    vac = vac + v
 	    vs = vs + 1
 	    
@@ -37,16 +38,16 @@ class pvoutput :
                 'X-Pvoutput-SystemId' : self.m_system_id}
       post = {'d' : str(t.tm_year).zfill(4) + str(t.tm_mon).zfill(2) + str(t.tm_mday).zfill(2),
               't' : str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2),
-              'v1' : str(gw.m_eday*1000),
-              'v2' : str(gw.m_pgrid),
-              'v5' : str(gw.m_temperature),
-              'v6' : str(gw.m_vpv[0] + gw.m_vpv[1]),
-	      'v7' : str(gw.m_vpv[0]),
-	      'v8' : str(gw.m_vpv[1]),
+              'v1' : str(gw.get_eday()*1000),
+              'v2' : str(gw.get_pgrid()),
+              'v5' : str(gw.get_temperature()),
+              'v6' : str(gw.get_vpv(0) + gw.get_vpv(1)),
+	      'v7' : str(gw.get_vpv(0)),
+	      'v8' : str(gw.get_vpv(1)),
 	      'v9' : str(p1),
 	      'v10' : str(p2),
 	      'v11' : str(vac),
-	      'v12' : str(gw.m_efficiency)}
+	      'v12' : str(gw.get_efficiency())}
       try:
          r = requests.post(self.m_url, headers=header, data=post, timeout=20)
       except Exception, arg:

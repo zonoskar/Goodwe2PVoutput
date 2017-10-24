@@ -162,7 +162,7 @@ class goodweData :
    #Compares select data members to determine if two instances of the
    #goodweData class are identical
    #
-      return self.m_sample.is_identical(gw)
+      return self.m_sample.is_identical(gw.m_sample)
 
 
    #--------------------------------------------------------------------------
@@ -172,19 +172,19 @@ class goodweData :
    #
       igw = gw
       
-      igw.set_vpv(0, (self.m_sample.get_vpv(0) + gw.get_vpv(0)) / 2)
-      igw.set_vpv(1, (self.m_sample.get_vpv(1) + gw.get_vpv(1)) / 2)
-      igw.set_ipv(0, (self.m_sample.get_ipv(0) + gw.get_ipv(0)) / 2)
-      igw.set_ipv(1, (self.m_sample.get_ipv(1) + gw.get_ipv(1)) / 2)
-      igw.set_vac(0, (self.m_sample.get_vac(0) + gw.get_vac(0)) / 2)
-      igw.set_vac(1, (self.m_sample.get_vac(1) + gw.get_vac(1)) / 2)
-      igw.set_vac(2, (self.m_sample.get_vac(2) + gw.get_vac(2)) / 2)
-      igw.set_iac(0, (self.m_sample.get_iac(0) + gw.get_iac(0)) / 2)
-      igw.set_iac(1, (self.m_sample.get_iac(1) + gw.get_iac(1)) / 2)
-      igw.set_iac(2, (self.m_sample.get_iac(2) + gw.get_iac(2)) / 2)
-      igw.set_fac(0, (self.m_sample.get_fac(0) + gw.get_fac(0)) / 2)
-      igw.set_fac(1, (self.m_sample.get_fac(1) + gw.get_fac(1)) / 2)
-      igw.set_fac(2, (self.m_sample.get_fac(2) + gw.get_fac(2)) / 2)
+      igw.set_vpv0( (self.m_sample.get_vpv(0) + gw.get_vpv0()) / 2)
+      igw.set_vpv1( (self.m_sample.get_vpv(1) + gw.get_vpv1()) / 2)
+      igw.set_ipv0( (self.m_sample.get_ipv(0) + gw.get_ipv0()) / 2)
+      igw.set_ipv1( (self.m_sample.get_ipv(1) + gw.get_ipv1()) / 2)
+      igw.set_vac0( (self.m_sample.get_vac(0) + gw.get_vac0()) / 2)
+      igw.set_vac1( (self.m_sample.get_vac(1) + gw.get_vac1()) / 2)
+      igw.set_vac2( (self.m_sample.get_vac(2) + gw.get_vac2()) / 2)
+      igw.set_iac0( (self.m_sample.get_iac(0) + gw.get_iac0()) / 2)
+      igw.set_iac1( (self.m_sample.get_iac(1) + gw.get_iac1()) / 2)
+      igw.set_iac2( (self.m_sample.get_iac(2) + gw.get_iac2()) / 2)
+      igw.set_fac0( (self.m_sample.get_fac(0) + gw.get_fac0()) / 2)
+      igw.set_fac1( (self.m_sample.get_fac(1) + gw.get_fac1()) / 2)
+      igw.set_fac2( (self.m_sample.get_fac(2) + gw.get_fac2()) / 2)
       igw.set_pgrid( (self.m_sample.get_pgrid() + gw.get_pgrid()) / 2)
       igw.set_eday( (self.m_sample.get_eday() + gw.get_eday()) / 2)
       igw.set_etotal( (self.m_sample.get_etotal() + gw.get_etotal()) / 2)
@@ -234,6 +234,49 @@ class goodweData :
       return self.m_sample.get_htotal()
    def get_efficiency( self):
       return self.m_sample.get_efficiency()
+
+
+   #--------------------------------------------------------------------------
+   def set_vpv0( self, val):
+      self.m_sample.set_vpv(0, val)
+   def set_vpv1( self, val):
+      self.m_sample.set_vpv(1, val)
+   def set_ipv0( self, val):
+      self.m_sample.set_ipv(0, val)
+   def set_ipv1( self, val):
+      self.m_sample.set_ipv(1, val)
+   def set_vac0( self, val):
+      self.m_sample.set_vac(0, val)
+   def set_vac1( self, val):
+      self.m_sample.set_vac(1, val)
+   def set_vac2( self, val):
+      self.m_sample.set_vac(2, val)
+   def set_iac0( self, val):
+      self.m_sample.set_iac(0, val)
+   def set_iac1( self, val):
+      self.m_sample.set_iac(1, val)
+   def set_iac2( self, val):
+      self.m_sample.set_iac(2, val)
+   def set_fac0( self, val):
+      self.m_sample.set_fac(0, val)
+   def set_fac1( self, val):
+      self.m_sample.set_fac(1, val)
+   def set_fac2( self, val):
+      self.m_sample.set_fac(2, val)
+   def set_pgrid( self, val):
+      self.m_sample.set_pgrid( val)
+   def set_eday( self, val):
+      self.m_sample.set_eday( val)
+   def set_temperature( self, val):
+      self.m_sample.set_temperature( val)
+   def set_etotal( self, val):
+      self.m_sample.set_etotal( val)
+   def set_htotal( self, val):
+      self.m_sample.set_htotal( val)
+   def set_efficiency( self, val):
+      self.m_sample.set_efficiency( val)
+   def set_inverter_sn( self, val):
+      self.m_sample.set_inverter_sn( val)
 
 
    #--------------------------------------------------------------------------
