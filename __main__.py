@@ -18,7 +18,6 @@ def mainloop( goodwe, pvoutput, csv, process):
    while True:
       interval = 4.0*60
       try: # Read Goodwe data from goodwe-power.com
-         goodwe.initialize()
          gw = goodwe.read_sample_data()
       except Exception, arg:
          interval = 1.0*60

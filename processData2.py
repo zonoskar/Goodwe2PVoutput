@@ -1,28 +1,28 @@
 import numpy as np
-import goodweData
+import goodweSample
 import copy
 
 class processData2 :
 
-   funcs = { 'vpv0': goodweData.goodweData.get_vpv0,\
-	     'vpv1': goodweData.goodweData.get_vpv1,\
-	     'ipv0': goodweData.goodweData.get_ipv0,\
-	     'ipv1': goodweData.goodweData.get_ipv1,\
-	     'vac0': goodweData.goodweData.get_vac0,\
-	     'vac1': goodweData.goodweData.get_vac1,\
-	     'vac2': goodweData.goodweData.get_vac2,\
-	     'iac0': goodweData.goodweData.get_iac0,\
-	     'iac1': goodweData.goodweData.get_iac1,\
-	     'iac2': goodweData.goodweData.get_iac2,\
-	     'fac0': goodweData.goodweData.get_fac0,\
-	     'fac1': goodweData.goodweData.get_fac1,\
-	     'fac2': goodweData.goodweData.get_fac2,\
-	     'pgrid': goodweData.goodweData.get_pgrid,\
-	     'eday': goodweData.goodweData.get_eday,\
-	     'etotal': goodweData.goodweData.get_etotal,\
-	     'htotal': goodweData.goodweData.get_htotal,\
-	     'temperature': goodweData.goodweData.get_temperature,\
-	     'efficiency': goodweData.goodweData.get_efficiency }
+   funcs = { 'vpv0': goodweSample.goodweSample.get_vpv0,\
+	     'vpv1': goodweSample.goodweSample.get_vpv1,\
+	     'ipv0': goodweSample.goodweSample.get_ipv0,\
+	     'ipv1': goodweSample.goodweSample.get_ipv1,\
+	     'vac0': goodweSample.goodweSample.get_vac0,\
+	     'vac1': goodweSample.goodweSample.get_vac1,\
+	     'vac2': goodweSample.goodweSample.get_vac2,\
+	     'iac0': goodweSample.goodweSample.get_iac0,\
+	     'iac1': goodweSample.goodweSample.get_iac1,\
+	     'iac2': goodweSample.goodweSample.get_iac2,\
+	     'fac0': goodweSample.goodweSample.get_fac0,\
+	     'fac1': goodweSample.goodweSample.get_fac1,\
+	     'fac2': goodweSample.goodweSample.get_fac2,\
+	     'pgrid': goodweSample.goodweSample.get_pgrid,\
+	     'eday': goodweSample.goodweSample.get_eday,\
+	     'etotal': goodweSample.goodweSample.get_etotal,\
+	     'htotal': goodweSample.goodweSample.get_htotal,\
+	     'temperature': goodweSample.goodweSample.get_temperature,\
+	     'efficiency': goodweSample.goodweSample.get_efficiency }
 
    #--------------------------------------------------------------------------
    def __init__( self, pvoutput):
@@ -57,23 +57,23 @@ class processData2 :
 
 	    
    #--------------------------------------------------------------------------
-   def fitAndLog( self, gw):
+   def fitAndLog( self, sample):
    #
-      self.log = copy.deepcopy(gw)
+      self.log = copy.deepcopy(sample)
       
-      self.log.set_vpv0( self._fitSample( self.funcs['vpv0']))
-      self.log.set_vpv1( self._fitSample( self.funcs['vpv1']))
-      self.log.set_ipv0( self._fitSample( self.funcs['ipv0']))
-      self.log.set_ipv1( self._fitSample( self.funcs['ipv1']))
-      self.log.set_vac0( self._fitSample( self.funcs['vac0']))
-      self.log.set_vac1( self._fitSample( self.funcs['vac1']))
-      self.log.set_vac2( self._fitSample( self.funcs['vac2']))
-      self.log.set_iac0( self._fitSample( self.funcs['iac0']))
-      self.log.set_iac1( self._fitSample( self.funcs['iac1']))
-      self.log.set_iac2( self._fitSample( self.funcs['iac2']))
-      self.log.set_fac0( self._fitSample( self.funcs['fac0']))
-      self.log.set_fac1( self._fitSample( self.funcs['fac1']))
-      self.log.set_fac2( self._fitSample( self.funcs['fac2']))
+      self.log.set_vpv(0, self._fitSample( self.funcs['vpv0']))
+      self.log.set_vpv(1, self._fitSample( self.funcs['vpv1']))
+      self.log.set_ipv(0, self._fitSample( self.funcs['ipv0']))
+      self.log.set_ipv(1, self._fitSample( self.funcs['ipv1']))
+      self.log.set_vac(0, self._fitSample( self.funcs['vac0']))
+      self.log.set_vac(1, self._fitSample( self.funcs['vac1']))
+      self.log.set_vac(2, self._fitSample( self.funcs['vac2']))
+      self.log.set_iac(0, self._fitSample( self.funcs['iac0']))
+      self.log.set_iac(1, self._fitSample( self.funcs['iac1']))
+      self.log.set_iac(2, self._fitSample( self.funcs['iac2']))
+      self.log.set_fac(0, self._fitSample( self.funcs['fac0']))
+      self.log.set_fac(1, self._fitSample( self.funcs['fac1']))
+      self.log.set_fac(2, self._fitSample( self.funcs['fac2']))
       self.log.set_pgrid( self._fitSample( self.funcs['pgrid']))
       self.log.set_eday( self._fitSample( self.funcs['eday']))
 #      self.log.set_etotal( self._fitSample( self.funcs['etotal']))
@@ -87,19 +87,19 @@ class processData2 :
 
    
    #--------------------------------------------------------------------------
-   def processSample( self, gw):
+   def processSample( self, sample):
    #
       if (self.bufferedSamples < 5):
-         self.sampleBuffer.append( gw);
+         self.sampleBuffer.append( sample);
 	 self.bufferedSamples += 1
-	 print "Buffering sample " + gw.to_short_string()
+	 print "Buffering sample " + sample.to_short_string()
       else:
          self.fitAndLog( self.sampleBuffer[2])
          self.sampleBuffer[0] = self.sampleBuffer[1]
          self.sampleBuffer[1] = self.sampleBuffer[2]
          self.sampleBuffer[2] = self.sampleBuffer[3]
          self.sampleBuffer[3] = self.sampleBuffer[4]
-         self.sampleBuffer[4] = gw
+         self.sampleBuffer[4] = sample
       
 
    #--------------------------------------------------------------------------

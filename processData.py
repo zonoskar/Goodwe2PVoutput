@@ -16,7 +16,7 @@ class processData :
                        self.LOG_PREV_DIFF: self.logging,
                        self.INTERPOLATE:   self.interpolate}
       self.m_state = self.BUFFERING                      
-      self.m_prev_gw = None
+      self.m_prev_sample = None
       self.m_pvoutput = pvoutput
       
       
@@ -28,13 +28,13 @@ class processData :
       
       
    #--------------------------------------------------------------------------
-   def update_state( self, gw):
+   def update_state( self, sample):
    # Updates the state.
    #
-      if not self.m_prev_gw:
+      if not self.m_prev_sample:
          self.m_state == self.BUFFERING
       else:
-         if gw.is_identical( self.m_prev_gw):
+         if sample.is_identical( self.m_prev_sample):
             self.m_state = self.LOG_PREV_SAME
          else:
             if self.m_state == self.LOG_PREV_SAME:
@@ -44,29 +44,29 @@ class processData :
 
 
    #--------------------------------------------------------------------------
-   def logging( self, gw):
-   # Processes the LOGGING state. This logs the m_prev_gw data
+   def logging( self, sample):
+   # Processes the LOGGING state. This logs the m_prev_sample data
    #
       if self.m_pvoutput:
-         self.m_pvoutput.post_data( self.m_prev_gw)
-      print "Logging: " + self.m_prev_gw.to_short_string()
+         self.m_pvoutput.post_data( self.m_prev_sample)
+      print "Logging: " + self.m_prev_sample.to_short_string()
       
       
    #--------------------------------------------------------------------------
-   def buffering( self, gw):
+   def buffering( self, sample):
    # Processes the BUFFERING state. Basically does nothing.
    #
-      print "Buffering: " + gw.to_short_string()
+      print "Buffering: " + sample.to_short_string()
       
       
    #--------------------------------------------------------------------------
-   def interpolate( self, gw):
+   def interpolate( self, sample):
    # Interpolates the current and the previous sample by using linear interpolation.
    #
-      gw1 = gw.interpolate( self.m_prev_gw)
+      sample1 = sample.interpolate( self.m_prev_sample)
       if self.m_pvoutput:
-         self.m_pvoutput.post_data( gw1)
-      print "Interpolate: " + gw1.to_short_string()
+         self.m_pvoutput.post_data( sample1)
+      print "Interpolate: " + sample1.to_short_string()
       self.m_state = self.LOG_PREV_DIFF
 
       
@@ -76,21 +76,21 @@ class processData :
    # last sample.
    #
       # Flush the last dat apoint to PVoutput
-      if self.m_prev_gw:
-         self.logging( self.m_prev_gw)
+      if self.m_prev_sample:
+         self.logging( self.m_prev_sample)
       self.m_state = self.BUFFERING 
-      self.m_prev_gw = None
+      self.m_prev_sample = None
    
    
    #--------------------------------------------------------------------------
-   def processSample( self, gw):
+   def processSample( self, sample):
    # This method processes the sample by calling the method associated with the
    # current state
    #
-      self.update_state( gw)
-      self.m_switch[self.m_state](gw)
+      self.update_state( sample)
+      self.m_switch[self.m_state](sample)
       
-      self.m_prev_gw = gw
+      self.m_prev_sample = sample
 
 
 #---------------- End of file ------------------------------------------------

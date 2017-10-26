@@ -48,7 +48,8 @@ class readGoodwe( iGoodwe.iGoodwe) :
       while True:
          try:
             sample = self._read_data( url)
-            return goodweData.goodweData( sample)
+            gw = goodweData.goodweData( sample)
+	    return gw.get_sample()
          except:
             tries += 1
             if tries > 3:

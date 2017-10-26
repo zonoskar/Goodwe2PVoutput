@@ -158,131 +158,24 @@ class goodweData :
       
 
    #--------------------------------------------------------------------------
-   def is_identical( self, gw):
+   def is_identical( self, sample):
    #Compares select data members to determine if two instances of the
    #goodweData class are identical
    #
-      return self.m_sample.is_identical(gw.m_sample)
+      return self.m_sample.is_identical(sample.m_sample)
 
 
    #--------------------------------------------------------------------------
-   def interpolate( self, gw):
-   #Interpolates two goodweData class instances by using linear 
-   #interpolation. This will yield a nicer graph in PVoutput.org
-   #
-      igw = gw
+   def get_sample( self):
+      return self.m_sample
       
-      igw.set_vpv0( (self.m_sample.get_vpv(0) + gw.get_vpv0()) / 2)
-      igw.set_vpv1( (self.m_sample.get_vpv(1) + gw.get_vpv1()) / 2)
-      igw.set_ipv0( (self.m_sample.get_ipv(0) + gw.get_ipv0()) / 2)
-      igw.set_ipv1( (self.m_sample.get_ipv(1) + gw.get_ipv1()) / 2)
-      igw.set_vac0( (self.m_sample.get_vac(0) + gw.get_vac0()) / 2)
-      igw.set_vac1( (self.m_sample.get_vac(1) + gw.get_vac1()) / 2)
-      igw.set_vac2( (self.m_sample.get_vac(2) + gw.get_vac2()) / 2)
-      igw.set_iac0( (self.m_sample.get_iac(0) + gw.get_iac0()) / 2)
-      igw.set_iac1( (self.m_sample.get_iac(1) + gw.get_iac1()) / 2)
-      igw.set_iac2( (self.m_sample.get_iac(2) + gw.get_iac2()) / 2)
-      igw.set_fac0( (self.m_sample.get_fac(0) + gw.get_fac0()) / 2)
-      igw.set_fac1( (self.m_sample.get_fac(1) + gw.get_fac1()) / 2)
-      igw.set_fac2( (self.m_sample.get_fac(2) + gw.get_fac2()) / 2)
-      igw.set_pgrid( (self.m_sample.get_pgrid() + gw.get_pgrid()) / 2)
-      igw.set_eday( (self.m_sample.get_eday() + gw.get_eday()) / 2)
-      igw.set_etotal( (self.m_sample.get_etotal() + gw.get_etotal()) / 2)
-      igw.set_htotal( (self.m_sample.get_htotal() + gw.get_htotal()) / 2)
-      igw.set_temperature( (self.m_sample.get_temperature() + gw.get_temperature()) / 2)
-      igw.set_efficiency( (self.m_sample.get_efficiency() + gw.get_efficiency()) / 2)
       
-      return igw
-      
-
-   #--------------------------------------------------------------------------
-   def get_vpv0( self):
-      return self.m_sample.get_vpv(0)
-   def get_vpv1( self):
-      return self.m_sample.get_vpv(1)
-   def get_ipv0( self):
-      return self.m_sample.get_ipv(0)
-   def get_ipv1( self):
-      return self.m_sample.get_ipv(1)
-   def get_vac0( self):
-      return self.m_sample.get_vac(0)
-   def get_vac1( self):
-      return self.m_sample.get_vac(1)
-   def get_vac2( self):
-      return self.m_sample.get_vac(2)
-   def get_iac0( self):
-      return self.m_sample.get_iac(0)
-   def get_iac1( self):
-      return self.m_sample.get_iac(1)
-   def get_iac2( self):
-      return self.m_sample.get_iac(2)
-   def get_fac0( self):
-      return self.m_sample.get_fac(0)
-   def get_fac1( self):
-      return self.m_sample.get_fac(1)
-   def get_fac2( self):
-      return self.m_sample.get_fac(2)
-   def get_pgrid( self):
-      return self.m_sample.get_pgrid()
-   def get_eday( self):
-      return self.m_sample.get_eday()
-   def get_temperature( self):
-      return self.m_sample.get_temperature()
-   def get_etotal( self):
-      return self.m_sample.get_etotal()
-   def get_htotal( self):
-      return self.m_sample.get_htotal()
-   def get_efficiency( self):
-      return self.m_sample.get_efficiency()
-
-
-   #--------------------------------------------------------------------------
-   def set_vpv0( self, val):
-      self.m_sample.set_vpv(0, val)
-   def set_vpv1( self, val):
-      self.m_sample.set_vpv(1, val)
-   def set_ipv0( self, val):
-      self.m_sample.set_ipv(0, val)
-   def set_ipv1( self, val):
-      self.m_sample.set_ipv(1, val)
-   def set_vac0( self, val):
-      self.m_sample.set_vac(0, val)
-   def set_vac1( self, val):
-      self.m_sample.set_vac(1, val)
-   def set_vac2( self, val):
-      self.m_sample.set_vac(2, val)
-   def set_iac0( self, val):
-      self.m_sample.set_iac(0, val)
-   def set_iac1( self, val):
-      self.m_sample.set_iac(1, val)
-   def set_iac2( self, val):
-      self.m_sample.set_iac(2, val)
-   def set_fac0( self, val):
-      self.m_sample.set_fac(0, val)
-   def set_fac1( self, val):
-      self.m_sample.set_fac(1, val)
-   def set_fac2( self, val):
-      self.m_sample.set_fac(2, val)
-   def set_pgrid( self, val):
-      self.m_sample.set_pgrid( val)
-   def set_eday( self, val):
-      self.m_sample.set_eday( val)
-   def set_temperature( self, val):
-      self.m_sample.set_temperature( val)
-   def set_etotal( self, val):
-      self.m_sample.set_etotal( val)
-   def set_htotal( self, val):
-      self.m_sample.set_htotal( val)
-   def set_efficiency( self, val):
-      self.m_sample.set_efficiency( val)
-   def set_inverter_sn( self, val):
-      self.m_sample.set_inverter_sn( val)
-
-
    #--------------------------------------------------------------------------
    def to_string( self):
       return self.m_sample.to_string()
    
+
+   #--------------------------------------------------------------------------
    def to_short_string( self):
       return self.m_sample.to_short_string()
    

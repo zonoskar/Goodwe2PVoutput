@@ -20,13 +20,13 @@ class pvoutput :
    #
       
       # Extended parameters.
-      p1 = gw.get_vpv(0) * gw.get_ipv(0) * gw.get_efficiency()
-      p2 = gw.get_vpv(1) * gw.get_ipv(1) * gw.get_efficiency()
+      p1 = gw.get_vpv0() * gw.get_ipv0() * gw.get_efficiency()
+      p2 = gw.get_vpv1() * gw.get_ipv1() * gw.get_efficiency()
       vs = 0
       vac = 0
       for i in xrange(3):
          v = gw.get_vac(i)
-         if vpv > 0:
+         if v > 0:
 	    vac = vac + v
 	    vs = vs + 1
 	    

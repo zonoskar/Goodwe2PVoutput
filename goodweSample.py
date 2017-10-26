@@ -1,4 +1,6 @@
-  
+import copy
+
+
 class goodweSample :
 
    #--------------------------------------------------------------------------
@@ -88,6 +90,36 @@ class goodweSample :
 
 
    #--------------------------------------------------------------------------
+   def interpolate( self, sample):
+   #Interpolates two goodweSample class instances by using linear 
+   #interpolation. This will yield a nicer graph in PVoutput.org
+   #
+      isample = copy.deepcopy(sample)
+      
+      isample.set_vpv(0, (self.get_vpv(0) + sample.get_vpv(0)) / 2)
+      isample.set_vpv(1, (self.get_vpv(1) + sample.get_vpv(1)) / 2)
+      isample.set_ipv(0, (self.get_ipv(0) + sample.get_ipv(0)) / 2)
+      isample.set_ipv(1, (self.get_ipv(1) + sample.get_ipv(1)) / 2)
+      isample.set_vac(0, (self.get_vac(0) + sample.get_vac(0)) / 2)
+      isample.set_vac(1, (self.get_vac(1) + sample.get_vac(1)) / 2)
+      isample.set_vac(2, (self.get_vac(2) + sample.get_vac(2)) / 2)
+      isample.set_iac(0, (self.get_iac(0) + sample.get_iac(0)) / 2)
+      isample.set_iac(1, (self.get_iac(1) + sample.get_iac(1)) / 2)
+      isample.set_iac(2, (self.get_iac(2) + sample.get_iac(2)) / 2)
+      isample.set_fac(0, (self.get_fac(0) + sample.get_fac(0)) / 2)
+      isample.set_fac(1, (self.get_fac(1) + sample.get_fac(1)) / 2)
+      isample.set_fac(2, (self.get_fac(2) + sample.get_fac(2)) / 2)
+      isample.set_pgrid( (self.get_pgrid() + sample.get_pgrid()) / 2)
+      isample.set_eday( (self.get_eday() + sample.get_eday()) / 2)
+      isample.set_etotal( (self.get_etotal() + sample.get_etotal()) / 2)
+      isample.set_htotal( (self.get_htotal() + sample.get_htotal()) / 2)
+      isample.set_temperature( (self.get_temperature() + sample.get_temperature()) / 2)
+      isample.set_efficiency( (self.get_efficiency() + sample.get_efficiency()) / 2)
+      
+      return isample
+      
+
+   #--------------------------------------------------------------------------
    def is_inverter_status( self, status):
        return status == self.m_inverter_status
 
@@ -95,18 +127,44 @@ class goodweSample :
    #--------------------------------------------------------------------------
    def get_vpv( self, i):
       return self.m_vpv[i]
+   def get_vpv0( self):
+      return self.m_vpv[0]
+   def get_vpv1( self):
+      return self.m_vpv[1]
 
    def get_ipv( self, i):
       return self.m_ipv[i]
+   def get_ipv0( self):
+      return self.m_ipv[0]
+   def get_ipv1( self):
+      return self.m_ipv[1]
 
    def get_vac( self, i):
       return self.m_vac[i]
+   def get_vac0( self):
+      return self.m_vac[0]
+   def get_vac1( self):
+      return self.m_vac[1]
+   def get_vac2( self):
+      return self.m_vac[2]
 
    def get_iac( self, i):
       return self.m_iac[i]
+   def get_iac0( self):
+      return self.m_iac[0]
+   def get_iac1( self):
+      return self.m_iac[1]
+   def get_iac2( self):
+      return self.m_iac[2]
 
    def get_fac( self, i):
       return self.m_fac[i]
+   def get_fac0( self):
+      return self.m_fac[0]
+   def get_fac1( self):
+      return self.m_fac[1]
+   def get_fac2( self):
+      return self.m_fac[2]
 
    def get_pgrid( self):
       return self.m_pgrid

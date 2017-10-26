@@ -283,6 +283,8 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def read_sample_data( self):
+      if not self.m_initialized:
+         goodwe.initialize()
       try:
          data = self._read_data_goodwe()
          self._convert_data( data)
@@ -295,7 +297,6 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def initialize( self):
-      if not self.m_initialized:
          try:
             self.m_initialized = False
             serial = self._send_init_goodwe_msg()
