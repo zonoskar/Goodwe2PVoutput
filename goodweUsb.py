@@ -23,6 +23,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
         
       self.init_message =''.join(chr(x) for x in [0xAA,0x55,0x80,0x7F,0x00,0x00,0x00])
       self.init_reply   =''.join(chr(x) for x in [0xAA,0x55,0x7F,0x80,0x00,0x80,0x10])
+      self.rem_message  =''.join(chr(x) for x in [0xAA,0x55,0x80,0x0B,0x00,0x02,0x00])
       self.ack_message  =''.join(chr(x) for x in [0xAA,0x55,0x80,0x7F,0x00,0x01,0x11])
       self.ack_reply    =''.join(chr(x) for x in [0xAA,0x55,0x80,0x7F,0x00,0x01,0x11])
       self.data_message =''.join(chr(x) for x in [0xAA,0x55,0x80,0x11,0x01,0x01,0x00])
@@ -111,7 +112,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       usb.util.dispose_resources( self.m_dev)
       self.m_dev = None
       self.m_epi = None
-      self.m_sample.set_online( 'Offline')
+      #self.m_sample.set_online( 'Offline')
       self.m_initialized = False
 
 
@@ -182,54 +183,93 @@ class goodweUsb( iGoodwe.iGoodwe) :
    #--------------------------------------------------------------------------
    def _create_send_buffer( self, buffer):
       '''This creates the send buffer'''
+      if append:
+         buffer=buffer+append
+      # calculate the CRC of the buffer
       h,l=self._crc16(buffer)
-      buffer.append(h)
-      buffer.append(l)
-      sendBuffer=bytearray([0xCC, 0x99, len(buffer)])
+      buffer=buffer + ''.join( [chr(h),chr(l)])
 
-      return sendBuffer.extend(buffer)
-   
-   
+      sendBuffer=''.join( chr(x) for x in [0xCC, 0x99, len(buffer)])
+#      sendBuffer=sendBuffer+buffer
+#      self._hexprint("SendBuffer", sendBuffer)
+
+      return sendBuffer+buffer
+
+
+   #--------------------------------------------------------------------------
+   def _goodwe_send( self, sendBuffer):
+      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, sendBuffer)
+
+      if lenn != len(sendBuffer):
+         print 'received length ' + str(lenn) + ' is not ' + str(len(sendBuffer)) + '.'
+
+      return lenn
+
+
    #--------------------------------------------------------------------------
    def _send_init_goodwe_msg( self):
       '''This initializes the Goodwe inverter'''
-      buffer=self.init_message
-      h,l=self._crc16(buffer)
-      buffer.extend(h)
-      buffer.extend(l)
-      
-      sendBuffer=self._create_send_buffer()
-      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, sendBuffer)
-      if lenn != 72:
-         print 'received length ' + str(lenn) + ' is not 72.'
+      sendBuffer=self._create_send_buffer( self.init_message)
+      self._hexprint( "sendBuffer in send_init_goodwe_msg", sendBuffer)
+      try:
+         lenn = self._goodwe_send( sendBuffer)
+      except Exception, ex:
+         raise IOError( "Unable send init message: " + str(ex))
 
       try:
          received_buffer = self._goodwe_receive( 8*8)
+         self._hexprint( "received buffer in send_init_goodwe_msg", received_buffer)
       except Exception, ex:
-         raise IOError( "Unable to init Goodwe USB" + str(ex))
+         raise IOError( "Unable to init Goodwe USB: " + str(ex))
 
       # extract serial number
       ss = received_buffer.find(self.init_reply) + len(self.init_reply)
+      serial=received_buffer[ss:ss+16]
+      serial=serial+chr(0x11)
+      self._hexprint( "Received serial", serial)
+      return serial
 
-      return received_buffer[ss:ss+16]
+
+   #--------------------------------------------------------------------------
+   def _hexprint( self, string, data):
+      print string
+      ret=':'
+      for character in data:
+        ret += '0x' + character.encode('hex') + ':'
+      print ret
 
 
    #--------------------------------------------------------------------------
    def _send_ack_goodwe_msg( self, serial):
-
-      buffer=self._update_message( self.ack_message, serial, 10)
-      crc=''.join(chr(x) for x in self._crc16(buffer, 28))
-      buffer=self._update_message( buffer, crc, 27)
+      '''This initializes the Goodwe inverter'''
+      print "Sending Goodwe initialize ACK"
+      sendBuffer=self._create_send_buffer( self.ack_message, serial)
 
       try:
-         lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, buffer)
-         received_buffer = self._goodwe_receive( 8*8)
+         lenn = self._goodwe_send( sendBuffer)
       except Exception, ex:
-         raise IOError( "Unable to send Goodwe USB acknowledge" + str(ex))
+         raise IOError( "Unable to send ACK message: " + str(ex))
+
+      try:
+         received_buffer = self._goodwe_receive( 8*8)
+         self._hexprint( "Received buffer", received_buffer)
+      except Exception, ex:
+         raise IOError( "Unable to send Goodwe USB acknowledge: " + str(ex))
 
       ss = received_buffer.find(self.ack_reply) + len(self.ack_reply)
       
-      return "".join(x.encode('ascii') for x in receive[ss:ss+16])
+      return "".join(x.encode('ascii') for x in received_buffer[ss:ss+16])
+
+
+   #--------------------------------------------------------------------------
+   def _remove_goodwe( self):
+      '''This removes the Goodwe inverter'''
+      sendBuffer=self._create_send_buffer( self.rem_message)
+      self._hexprint( "Remove goodwe", sendBuffer)
+      try:
+         lenn = self._goodwe_send( sendBuffer)
+      except Exception, ex:
+         raise IOError( "Unable to remove Goodwe inverter: " + str(ex))
 
 
    #--------------------------------------------------------------------------
@@ -237,10 +277,14 @@ class goodweUsb( iGoodwe.iGoodwe) :
       more = True
 
       while more:
-         lenn = self.m_dev.ctrl_transfer( 0x22, 0x09, 0, 0, self.data_message)
-#         print "Transferred " + str(lenn) + " bytes for read_data."
+         try:
+            lenn = self._goodwe_send( sendBuffer)
+         except Exception, ex:
+            raise IOError( "Unable to send read data message: " + str(ex))
+
          try:
             received = self._goodwe_receive( 9*8)
+            self._hexprint( "Received data buffer from read", received)
          except Exception, ex:
             raise IOError( "Unable to read from Goodwe USB " + str(ex))
          else:
@@ -278,9 +322,11 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_sample.set_pgrid( self._scale_data( indata, base+26, 2,   1.0))
 
       if self._scale_data( indata, base+28, 2,   1.0) > 0.0:
-         self.m_sample.set_online( 'Normal')
+         #self.m_sample.set_online( 'Normal')
+         print "Online"
       else:
-         self.m_sample.set_online( 'Offline')
+         print "Offline"
+         #self.m_sample.set_online( 'Offline')
 
       self.m_sample.set_temperature( self._scale_data( indata, base+30, 2,  10.0))
       self.m_sample.set_etotal( self._scale_data( indata, base+36, 4,  10.0))
@@ -305,25 +351,43 @@ class goodweUsb( iGoodwe.iGoodwe) :
    #--------------------------------------------------------------------------
    def read_sample_data( self):
       if not self.m_initialized:
-         goodwe.initialize()
+         self.initialize()
       try:
          data = self._read_data_goodwe()
          self._convert_data( data)
+         print self.m_sample.to_string()
       except Exception, ex:
-	 self.m_sample.set_online( 'Offline')
-         raise IOError( "Cannot read from GoodweUSB" + str(ex))
+         print "Error, set offline"
+#	 self.m_sample.set_online( 'Offline')
+         raise IOError( "Cannot read from GoodweUSB: " + str(ex))
 
       return self.m_sample
 
 
    #--------------------------------------------------------------------------
    def initialize( self):
+      tries = 0
+      self.m_initialized = False
+
+      while not self.m_initialized:
+         print "Try init " + str(tries)
          try:
-            self.m_initialized = False
+            print "Init goodwe"
+            self._remove_goodwe()
             serial = self._send_init_goodwe_msg()
             sn = self._send_ack_goodwe_msg( serial)
+            print "All initialized"
          except Exception, ex:
-            raise IOError( "Cannot initialize Goodwe inverter")
+            print "Received exception: \'" +str(ex)+ "\' Trying again."
+#            self.terminate_usb()
+#            time.sleep(3)
+#            self.usb_init()
+            time.sleep(2)
+#            self._remove_goodwe()
+
+            tries+=1
+            if (tries > 40):
+               raise IOError("Cannot initialize Goodwe inverter via USB: " + str(ex))
          else:
             self.m_sample.set_inverter_sn( sn)
             self.m_initialized = True
