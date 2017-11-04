@@ -21,41 +21,12 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_initialized = False
       self.m_deviceId = deviceId
         
-      self.init_message =''.join(chr(x) for x in [0xCC,0x99,0x09,0xAA,0x55,0x80,0x7F,0x00,
-                                                  0x00,0x00,0x01,0xFE,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00])
-
+      self.init_message =''.join(chr(x) for x in [0xAA,0x55,0x80,0x7F,0x00,0x00,0x00])
       self.init_reply   =''.join(chr(x) for x in [0xAA,0x55,0x7F,0x80,0x00,0x80,0x10])
-
-      self.ack_message  =''.join(chr(x) for x in [0xCC,0x99,0x1A,0xAA,0x55,0x80,0x7F,0x00, 
-                                                  0x01,0x11,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x11,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00])
-
+      self.ack_message  =''.join(chr(x) for x in [0xAA,0x55,0x80,0x7F,0x00,0x01,0x11])
       self.ack_reply    =''.join(chr(x) for x in [0xAA,0x55,0x80,0x7F,0x00,0x01,0x11])
-
-      self.data_message =''.join(chr(x) for x in [0xCC,0x99,0x09,0xAA,0x55,0x80,0x11,0x01, 
-                                                  0x01,0x00,0x01,0x92,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                                                  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00])
-
-      self.data_start   =''.join(chr(x) for x in [0x55,0x11,0x80,0x01,0x81])
+      self.data_message =''.join(chr(x) for x in [0xAA,0x55,0x80,0x11,0x01,0x01,0x00])
+      self.data_start   =''.join(chr(x) for x in [0xAA,0x55,0x11,0x80,0x01,0x81,0x00])
 
 
    #--------------------------------------------------------------------------
@@ -111,10 +82,10 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
 
    #--------------------------------------------------------------------------
-   def _crc16( self, buffer, dataLength):
+   def _crc16( self, buffer):
       crc = 0
-      for cnt in xrange(dataLength-3):
-         crc += ord(buffer[cnt+3])
+      for cnt in xrange(len(buffer)):
+         crc += ord(buffer[cnt])
    
       #write out the high and low
       high = (crc >> 8) & 0xff;
@@ -175,10 +146,23 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
 
    #--------------------------------------------------------------------------
+   def _create_send_buffer( self, buffer, append=None):
+      '''This creates the send buffer'''
+      if append:
+         buffer.extend(append)
+      h,l=self._crc16(buffer)
+      buffer.append(h)
+      buffer.append(l)
+      sendBuffer=bytearray([0xCC, 0x99, len(buffer)])
+
+      return sendBuffer.extend(buffer)
+   
+   
+   #--------------------------------------------------------------------------
    def _send_init_goodwe_msg( self):
       '''This initializes the Goodwe inverter'''
-
-      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, self.init_message)
+      sendBuffer=self._create_send_buffer( self.init_message)
+      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, sendBuffer)
       if lenn != 72:
          print 'received length ' + str(lenn) + ' is not 72.'
 
@@ -195,13 +179,11 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def _send_ack_goodwe_msg( self, serial):
-
-      buffer=self._update_message( self.ack_message, serial, 10)
-      crc=''.join(chr(x) for x in self._crc16(buffer, 28))
-      buffer=self._update_message( buffer, crc, 27)
+      '''This initializes the Goodwe inverter'''
+      sendBuffer=self._create_send_buffer( self.ack_message, serial)
 
       try:
-         lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, buffer)
+         lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, sendBuffer)
          received_buffer = self._goodwe_receive( 8*8)
       except Exception, ex:
          raise IOError( "Unable to send Goodwe USB acknowledge" + str(ex))
@@ -213,10 +195,12 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def _read_data_goodwe( self):
+      '''This initializes the Goodwe inverter'''
       more = True
+      sendBuffer=self._create_send_buffer( self.data_message)
 
       while more:
-         lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, self.data_message)
+         lenn = self.m_dev.ctrl_transfer( 0x22, 0x09, 0, 0, sendBuffer)
 #         print "Transferred " + str(lenn) + " bytes for read_data."
          try:
             received = self._goodwe_receive( 9*8)

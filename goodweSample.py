@@ -55,6 +55,13 @@ class goodweSample :
 
 
    #--------------------------------------------------------------------------
+   def get_csv_header( self):
+   #Returns the CSV header format string.
+   #
+      return "Date, Time, Line, Inverter_SN, Inverter_status, Pgrid, Eday, Etotal, Htotal, Error, Vpv1, Vpv2, Ipv1, Ipv2, Vac1, Vac2, Vac3, Iac1, Iac2, Iac3, Fac1, Fac2, Fac3, Temperature, Vbattery, Ibattery, SOC, Vload, Iload, Pload, Consume_day, Consume_total, Efficiency"
+
+
+   #--------------------------------------------------------------------------
    def to_csv_string( self):
    #Creates a string repesentation of the class, separated by ','.
    #
