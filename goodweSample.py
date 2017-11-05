@@ -224,9 +224,6 @@ class goodweSample :
    def get_consume_total( self):
       return self.m_consume_total
    
-   def is_online( self):
-      return self.is_inverter_status( 'Normal')   
-   
    #--------------------------------------------------------------------------
    def set_vpv( self, i, val):
       self.m_vpv[i] = val

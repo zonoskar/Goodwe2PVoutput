@@ -11,6 +11,11 @@ class iGoodwe :
       pass
 
    #--------------------------------------------------------------------------
+   def is_online( self):
+      '''Is online?'''
+      return False
+      
+   #--------------------------------------------------------------------------
    def read_sample_data( self):
       '''Read a data sample.'''
       return None         

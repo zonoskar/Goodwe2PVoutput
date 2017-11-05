@@ -23,7 +23,7 @@ def mainloop( goodwe, pvoutput, csv, process):
          interval = 1.0*60
          print "Read data Error: " + str(arg)
       else:
-         if gw.is_online():
+         if goodwe.is_online():
             # write CSV file
             csv.write_data( gw)
             process.processSample( gw)
