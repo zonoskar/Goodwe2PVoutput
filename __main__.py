@@ -69,9 +69,9 @@ if __name__ == "__main__":
          process = processData.processData( pvoutput)
       
    if config.get_input_source() == 'USB':
-      goodwe = goodweUsb.goodweUsb( 0x0084)
+      goodwe = goodweUsb.goodweUsb( ' ', ' ', 0x0084)
       try:
-         goodwe.usb_init()
+         goodwe.initialize()
          print "USB connection initialized"
       except Exception, ex:
          print ex
