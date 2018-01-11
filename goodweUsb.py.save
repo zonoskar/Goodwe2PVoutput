@@ -41,6 +41,7 @@ class FC:
    result_stt = 0x83
 
 
+
 class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
@@ -51,7 +52,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_state = State.OFFLINE
       self.m_serialNumber = ""
       self.m_serialBuffer = ''
-      self.m_inverter_adr = 0x11
+      self.m_inverter_adr = 0x0B
       self.m_inverter_adr_confirmed = False
       self.m_deviceId = station_id
       self.m_dev = None
@@ -77,7 +78,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
 			    State.CONNECTED:  self._remove_registration,
 			    State.DISCOVER:   self._discover_goodwe,
 			    State.ALLOC:      self._alloc_register,
-			    State.ALLOC_CONF: self._read_data_goodwe,
+			    State.ALLOC_CONF: self._no_action,
 			    State.ALLOC_ASK:  self._read_data_init,
 			    State.RUNNING:    self._read_data }
 
@@ -122,7 +123,6 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_initialized = False
       self.m_state = State.OFFLINE
 
-      print "Emulation active: " + str(self.m_emulated)
       try:
          self._terminate_usb()
       except:
@@ -152,21 +152,24 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Read a data sample.'''
       print "Read sample data. State=" + str(self.m_state)
       tries = 0
-      sample_read = False
-      while not sample_read:
+      while True:
          try:
+            print "Switch state. State=" + str(self.m_state)
             expectAnswer = self.state_switch[self.m_state]()
+           # print "Expect answer: " +str(expectAnswer)
             if expectAnswer:
-               sample_read = self._read_data_goodwe()
+               print "Read the response. State=" + str(self.m_state)
+               self._read_data_goodwe()
+            #   print "Answer read."
          except Exception, ex:
             print "Exception found: " +str(ex)
             if tries < 10:
+               #self._terminate_usb()
                self.m_state = State.CONNECTED
                tries+=1
             else:
                raise IOError( "Cannot read from GoodweUSB in state %s: %s" % (str(self.m_state), str(ex)))
 
-      return self.m_sample
 
    #--------------------------------------------------------------------------
    # internal functions
@@ -188,6 +191,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
          print "Need to detach kernel driver."
          self.m_dev.detach_kernel_driver(0)
          print "Claiming device."
+      print self.m_dev
       try:
          print "Setting default USB configuration."
          self.m_dev.set_configuration()
@@ -230,22 +234,28 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Continiuously read messages from the Goodwe inverter until a complete
          message packet has been received. The start of the message is marked
          with 2 bytes: 0xAA, 0x55. The 5th byte represents the message length.'''
-      sample_read = False
       more = True
       startFound = False
       dataLen = 0
       dataPtr = 0
       lastByte = 0x00
       inBuffer = ''
+      print "Read data from Goodwe."
 
       try:
          while more:
-            dataStream = self.m_dev.read( self.m_epi, 8, 0x200)
+            print "Reading from USB"
+            dataStream = self.m_dev.read( self.m_epi, 8, 1000)
+            print "Received datastream: " + str(dataStream)
+#            self._hexprint("Received:", dataStream)
 
             for byte in dataStream:
+               print "Processing incoming data: " + str(startFound) + " : " + str(byte)
                if startFound:
+	          print "dataLen:" + str(dataLen)
+	          print "dataPtr:" + str(dataPtr)
                   if dataLen > 0 or dataPtr < 5:
-                     inBuffer+=chr(byte)
+                     inBuffer += byte
                      dataPtr += 1
                      if dataPtr == 5:
                         dataLen = byte + 2
@@ -255,23 +265,28 @@ class goodweUsb( iGoodwe.iGoodwe) :
                   if dataPtr >= 5 and dataLen == 0:
                      self._hexprint("inBuffer:", inBuffer)
                      startFound = False
-                     sample_read = self._check_crc_and_update_state( inBuffer)
+                     self._check_crc_and_update_state( inBuffer)
                      more = False
 
+	       print "Check %s=%s and %s=%s" % (str(byte), str(hex(0x55)), str(lastByte), str(hex(0xAA)))
                if byte == 85 and lastByte == 170:
+	          print "start found"
                   startFound = True
                   dataPtr = 0
                   dataLen = 0
-                  inBuffer=''.join(chr(x) for x in [lastByte, byte])
+                  inBuffer=''.join(chr(x) for x in [ord(lastByte), ord(byte)])
                   lastByte = 0x00
+
+               print "Store lastbyte"
 
                lastByte = byte
       except Exception, ex:
-         print "Exception while read: " + str(ex) + ". Try again."
+         print "Exception while read: " + str(ex)
+#         self.m_state = State.OFFLINE
          pass
+#         raise IOError(" Unable to read 8 bytes from USB: " + str(ex))
 
-      return sample_read
-
+      return inBuffer
 
    #--------------------------------------------------------------------------
    def _check_crc_and_update_state( self, inBuffer):
@@ -279,34 +294,32 @@ class goodweUsb( iGoodwe.iGoodwe) :
          message from the Goodwe inverter, then interpret the received message 
          and call the correct message reply function. The CRC is encoded in the
          last 2 bytes and is not included in the CRC calculation.'''
-      sample_read = False
       hB = inBuffer[len(inBuffer)-2]
       lB = inBuffer[len(inBuffer)-1]
       hC,lC = self._calc_crc16( inBuffer, len(inBuffer)-2)
 
       if not ((ord(hB) == hC) and (ord(lB) == lC)):
-         raise ValueError("Calculated CRC (%s:%s) doesn't match message CRC (%s:%s)" %(hex(ord(hB)),hex(ord(lB)),hex(hC),hex(lC)))
+         raise ValueError("Calculated CRC doesn't match message CRC")
 
-      src = ord(inBuffer[2])
-      dst = ord(inBuffer[3])
-      cc =  ord(inBuffer[4])
-      fc =  ord(inBuffer[5])
-      lenn =ord(inBuffer[6])
-      data = inBuffer[7:]
+      src = ord(inBuffer[0])
+      dst = ord(inBuffer[1])
+      cc =  ord(inBuffer[2])
+      fc =  ord(inBuffer[3])
+      lenn =ord(inBuffer[4])
+      data = inBuffer[5:]
 
-#      print "Src: " +str(src)
-#      print "dst: " +str(dst)
-#      print "cc: " +str(cc)
-#      print "fc: " +str(fc)
-#      print "lenn: " +str(lenn)
+      print "Src: " +str(src)
+      print "dst: " +str(src)
+      print "cc: " +str(cc)
+      print "fc: " +str(fc)
+      print "lenn: " +str(lenn)
       # Call the reply function for the received message
       if cc == CC.reg:
-         self.cc_reg_switch[fc]( src, lenn, data)
+         print "Registration"
+         self.cc_reg_switch[fc]( src, lenn, inBuffer)
       elif cc == CC.read:
-         sample_read = self.cc_read_switch[fc]( src, lenn, data)
-
-      return sample_read
-
+         print "Read"
+         self.cc_read_switch[fc]( src, lenn, inBuffer)
 
    #--------------------------------------------------------------------------
    def _calc_crc16( self, buffer, length):
@@ -315,7 +328,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       for cnt in xrange(length):
          crc += ord(buffer[cnt])
 
-      #return the high and low
+      #write out the high and low
       high = (crc >> 8) & 0xff;
       low = crc & 0xff;
 
@@ -339,13 +352,12 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''When the inverter sends the registration message.'''
       print "Inverter registration received."
       self.m_serialBuffer = inBuffer[0:16]
-      print "Serial number: " + str(self.m_serialBuffer)
       self.m_state = State.ALLOC
 
    #--------------------------------------------------------------------------
    def _reg_received_confirm_registration( self, src, lenn, inBuffer):
-      '''When the inverter sends the registration confirmation message.'''
-      print "Inverter registration confirmation received at address: " + hex(src)
+      '''When th einverter sends the registration confirmation message.'''
+      print "Inverter registration confirmation received."
       if self.m_inverter_adr == src:
          self.m_inverter_adr_confirmed = True
          self.m_state = State.ALLOC_ASK
@@ -355,57 +367,58 @@ class goodweUsb( iGoodwe.iGoodwe) :
    #--------------------------------------------------------------------------
    def _read_received_message( self, src, lenn, inBuffer):
       '''When the inverter sends the sample data.'''
-      print "Read message received length: " + str(lenn)
+      print "Read message received"
       self._convert_data( inBuffer, lenn == 66)
-      return True
 
    #--------------------------------------------------------------------------
    def _scale_data( self, indata, offset, length, factor):
       '''Function to decode and scale the received sample data.'''
       res = 0.0
-
+      print "scale data " + str(length)
       for i in xrange(length):
          h = int(indata[offset+i].encode('hex'),16)
          res = res * 256.0 + float(h)
+
       return res / factor
 
    #--------------------------------------------------------------------------
    def _convert_data( self, indata, isDTseries):
       '''Function to disassemble the incoming data into readable format.'''
-      self.m_sample.set_inverter_sn( self.m_serialBuffer)
-      self.m_sample.set_vpv(0, self._scale_data( indata, 0, 2,  10.0))
-      self.m_sample.set_vpv(1, self._scale_data( indata, 2, 2,  10.0))
-      self.m_sample.set_ipv(0, self._scale_data( indata, 4, 2,  10.0))
-      self.m_sample.set_ipv(1, self._scale_data( indata, 6, 2,  10.0))
-      self.m_sample.set_vac(0, self._scale_data( indata, 8, 2,  10.0))
+      base = 6
+      self.m_sample.set_vpv(0, self._scale_data( indata, base+ 0, 2,  10.0))
+      self.m_sample.set_vpv(1, self._scale_data( indata, base+ 2, 2,  10.0))
+      self.m_sample.set_ipv(0, self._scale_data( indata, base+ 4, 2,  10.0))
+      self.m_sample.set_ipv(1, self._scale_data( indata, base+ 6, 2,  10.0))
+      self.m_sample.set_vac(0, self._scale_data( indata, base+ 8, 2,  10.0))
       if isDTseries:
-         self.m_sample.set_vac(1, self._scale_data( indata, 10, 2,  10.0))
-         self.m_sample.set_vac(2, self._scale_data( indata, 12, 2,  10.0))
-      self.m_sample.set_iac(0, self._scale_data( indata, 14, 2,  10.0))
+         self.m_sample.set_vac(1, self._scale_data( indata, base+10, 2,  10.0))
+         self.m_sample.set_vac(2, self._scale_data( indata, base+12, 2,  10.0))
+      self.m_sample.set_iac(0, self._scale_data( indata, base+14, 2,  10.0))
       if isDTseries:
-         self.m_sample.set_iac(1, self._scale_data( indata, 16, 2,  10.0))
-         self.m_sample.set_iac(2, self._scale_data( indata, 18, 2,  10.0))
-      self.m_sample.set_fac(0, self._scale_data( indata, 20, 2, 100.0))
+         self.m_sample.set_iac(1, self._scale_data( indata, base+16, 2,  10.0))
+         self.m_sample.set_iac(2, self._scale_data( indata, base+18, 2,  10.0))
+      self.m_sample.set_fac(0, self._scale_data( indata, base+20, 2, 100.0))
       if isDTseries:
-         self.m_sample.set_fac(1, self._scale_data( indata, 22, 2, 100.0))
-         self.m_sample.set_fac(2, self._scale_data( indata, 24, 2, 100.0))
-      self.m_sample.set_pgrid( self._scale_data( indata, 26, 2,   1.0))
+         self.m_sample.set_fac(1, self._scale_data( indata, base+22, 2, 100.0))
+         self.m_sample.set_fac(2, self._scale_data( indata, base+24, 2, 100.0))
+      self.m_sample.set_pgrid( self._scale_data( indata, base+26, 2,   1.0))
 
-      if self._scale_data( indata, 28, 2,   1.0) > 0.0:
-         self.m_sample.set_inverter_status( 'Normal')
+      if self._scale_data( indata, base+28, 2,   1.0) > 0.0:
+         #self.m_sample.set_online( 'Normal')
+         print "Online"
       else:
-         self.m_sample.set_inverter_status( 'Offline')
+         print "Offline"
+         #self.m_sample.set_online( 'Offline')
 
-      self.m_sample.set_temperature( self._scale_data( indata, 30, 2,  10.0))
-      self.m_sample.set_etotal( self._scale_data( indata, 36, 4,  10.0))
-      self.m_sample.set_htotal( self._scale_data( indata, 40, 4,   1.0))
-      self.m_sample.set_eday(   self._scale_data( indata, 64, 2,  10.0))
-
-      self.m_sample.set_error( indata[32:35])
+      self.m_sample.set_temperature( self._scale_data( indata, base+30, 2,  10.0))
+      self.m_sample.set_etotal( self._scale_data( indata, base+36, 4,  10.0))
+      self.m_sample.set_htotal( self._scale_data( indata, base+40, 4,   1.0))
+      self.m_sample.set_eday(   self._scale_data( indata, base+64, 2,  10.0))
+      self.m_sample.set_error( indata[base+73:base+77])
       try:
-         self.m_sample.set_efficiency( self.m_sample.get_pgrid() / ((self.m_sample.get_vpv(0) * self.m_sample.get_ipv(0)) + (self.m_sample.get_vpv(1) * self.m_sample.get_ipv(1))))
+         self.m_sample.set_eff( self.m_sample.get_pgrid() / ((self.m_sample.get_vpv(0) * self.m_sample.get_ipv(0)) + (self.m_sample.get_vpv(1) * self.m_sample.get_ipv(1))))
       except:
-         self.m_sample.set_efficiency( 0.0)
+         self.m_sample.set_eff( 0.0)
 
       #Values that I'm not using (or don't know what they are
       self.m_sample.set_consume_day(0.0)
@@ -414,9 +427,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_sample.set_ibattery(0.0)
       self.m_sample.set_soc(0.0)
       self.m_sample.set_load(0.0)
-      self.m_sample.set_description('Inverter address %s' % (hex(self.m_inverter_adr)))
-#      print "So far: " + self.m_sample.to_detailed_string()
-
+      self.m_sample.set_description('')
 
    #--------------------------------------------------------------------------
    def _remove_registration( self):
@@ -444,15 +455,12 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Function to handle the message state machine. This function handles
          the registration of the inverter. A message is sent with the 
          previously received serial number.'''
-      print "Allocating register for serial: " + str(self.m_serialBuffer)
-      serial=self.m_serialBuffer
-      print "Adding address"
-      serial+=chr(self.m_inverter_adr)
-      print "Allocated register for serial: " + str(self.m_serialBuffer) + " Sending..."
+      serial=''.join(chr(x) for x in self.m_serialBuffer)
+      serial+=self.m_inverter_adr
 
       self._goodwe_send( 0x7F, CC.reg, FC.allocreg, len(serial), serial)
       self.m_state = State.ALLOC_CONF
-      return True
+      return False
 
    #--------------------------------------------------------------------------
    def _no_action( self):
@@ -465,7 +473,6 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Function to handle the message state machine. This function handles
          the first request of sample data. A message is sent with the
          previously negotiated inverter address.'''
-      print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
       self._goodwe_send( self.m_inverter_adr, CC.read, FC.query, 0)
       self.m_state = State.RUNNING
       return True
@@ -475,7 +482,6 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Function to handle the message state machine. This function handles
          subsequent requests of sample data. A message is sent with the
          previously negotiated inverter address.'''
-      print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
       if self.m_inverter_adr_confirmed:
          self._goodwe_send( self.m_inverter_adr, CC.read, FC.query, 0)
 	 return True
@@ -484,19 +490,19 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
    def _goodwe_send( self, address, cc, fc, length, data = None):
-#      print "Creating sendbuffer."
+      print "Creating sendbuffer."
       buf=''.join(chr(x) for x in [0xAA, 0x55, 0x80, address, cc, fc, length])
 
       if data:
          buf+=data
-#         self._hexprint("goodwe added data", buf)
+         self._hexprint("goodwe added data", buf)
 
       h,l = self._calc_crc16(buf, len(buf))
       buf+=''.join(chr(x) for x in [h,l])
       sendBuffer=''.join(chr(x) for x in [0xCC, 0x99, len(buf)]) + buf
       self._hexprint("goodwe send", sendBuffer)
 
-      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0x200, 0, sendBuffer)
+      lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0, 0, sendBuffer)
 #      print lenn
       if lenn != len(sendBuffer):
          print 'received length ' + str(lenn) + ' is not ' + str(len(sendBuffer)) + '.'

@@ -20,7 +20,9 @@ class goodweSample :
       self.m_etotal = 0.0
       self.m_htotal = 0.0
       self.m_temperature = 0.0
-      self.m_load = ''
+      self.m_vload = 0.0
+      self.m_iload = 0.0
+      self.m_pload = 0.0
 
       self.m_vpv = []
       self.m_ipv = []
@@ -66,6 +68,46 @@ class goodweSample :
    #Creates a string repesentation of the class, separated by ','.
    #
       return str(self.m_line) + ", " + str(self.m_inverter_sn) + ", " + str(self.m_description) + ", " + str(self.m_inverter_status) + ", " + str(self.m_pgrid) + ", " + str(self.m_eday) + ", " + str(self.m_etotal) + ", " + str(self.m_htotal) + ", " + str(self.m_error) + ", " + str(self.m_vpv[0]) + ", " + str(self.m_vpv[1]) + ", " + str(self.m_ipv[0]) + ", " + str(self.m_ipv[1]) + ", " + str(self.m_vac[0]) + ", " + str(self.m_vac[1]) + ", " + str(self.m_vac[2]) + ", " + str(self.m_iac[0]) + ", " + str(self.m_iac[1]) + ", " + str(self.m_iac[2]) + ", " + str(self.m_fac[0]) + ", " + str(self.m_fac[1]) + ", " + str(self.m_fac[2]) + ", " + str(self.m_temperature) + ", " + str(self.m_consume_day) + ", " + str(self.m_consume_total) + ", " + str(self.m_efficiency)
+
+
+   #--------------------------------------------------------------------------
+   def to_detailed_string( self):
+   #Creates a detailed string repesentation of the class
+   #
+      s = 'Goodwe sample for inverter '
+      s = s + "S/N:    " + str(self.m_inverter_sn) + "\n"
+      s = s + "Desc:   " + str(self.m_description) + "\n"
+      s = s + "Status: " + str(self.m_inverter_status) + "\n"
+      s = s + "Pgrid:  " + str(self.m_pgrid) + "\n"
+      s = s + "Eday:   " + str(self.m_eday) + "\n"
+      s = s + "Etotal: " + str(self.m_etotal) + "\n"
+      s = s + "Htotal: " + str(self.m_htotal) + "\n"
+      s = s + "Error:  " + str(self.m_error) + "\n"
+      s = s + "Vpv0:  " + str(self.m_vpv[0]) + "\n"
+      s = s + "Vpv1:  " + str(self.m_vpv[1]) + "\n"
+      s = s + "Ipv0:  " + str(self.m_ipv[0]) + "\n"
+      s = s + "Ipv1:  " + str(self.m_ipv[1]) + "\n"
+      s = s + "Vac0:  " + str(self.m_vac[0]) + "\n"
+      s = s + "Vac1:  " + str(self.m_vac[1]) + "\n"
+      s = s + "Vac2:  " + str(self.m_vac[2]) + "\n"
+      s = s + "Iac0:  " + str(self.m_iac[0]) + "\n"
+      s = s + "Iac1:  " + str(self.m_iac[1]) + "\n"
+      s = s + "Iac2:  " + str(self.m_iac[2]) + "\n"
+      s = s + "Fac0:  " + str(self.m_fac[0]) + "\n"
+      s = s + "Fac1:  " + str(self.m_fac[1]) + "\n"
+      s = s + "Fac2:  " + str(self.m_fac[2]) + "\n"
+      s = s + "Temp:  " + str(self.m_temperature) + "\n"
+      s = s + "Vbat:  " + str(self.m_vbattery) + "\n"
+      s = s + "Ibat:  " + str(self.m_ibattery) + "\n"
+      s = s + "SOC:   " + str(self.m_soc) + "\n"
+      s = s + "Vload: " + str(self.m_vload) + "\n"
+      s = s + "Iload: " + str(self.m_iload) + "\n"
+      s = s + "Pload: " + str(self.m_pload) + "\n"
+      s = s + "Cday:  " + str(self.m_consume_day) + "\n"
+      s = s + "Ctot:  " + str(self.m_consume_total) + "\n"
+      s = s + "Eff:   " + str(self.m_efficiency)
+
+      return s
 
 
    #--------------------------------------------------------------------------
@@ -216,7 +258,7 @@ class goodweSample :
       return self.m_soc
    
    def get_load( self):
-      return self.m_load
+      return self.m_vload
    
    def get_consume_day( self):
       return self.m_consume_day
@@ -283,7 +325,7 @@ class goodweSample :
       self.m_soc = val
    
    def set_load( self, val):
-      self.m_load = val
+      self.m_vload = val
    
    def set_consume_day( self, val):
       self.m_consume_day = val
