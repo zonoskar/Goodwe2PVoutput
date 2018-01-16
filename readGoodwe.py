@@ -14,6 +14,7 @@ class readGoodwe( iGoodwe.iGoodwe) :
       self.m_login_url = login_url
       self.m_station_id = station_id
       self.m_session = None
+      self.gwData = None
       
 
    #--------------------------------------------------------------------------
@@ -26,6 +27,7 @@ class readGoodwe( iGoodwe.iGoodwe) :
 	 
       with requests.Session() as self.m_session:
          p = self.m_session.post( self.m_login_url, data=payload)
+	 print "Sent password " + str(p.status_code)
 	 if p.status_code != 200:
 	    if 'incorrect' in p.text:
 	       print "Incorrect password for user " + str(username)
@@ -48,8 +50,8 @@ class readGoodwe( iGoodwe.iGoodwe) :
       while True:
          try:
             sample = self._read_data( url)
-            gw = goodweData.goodweData( sample)
-	    return gw.get_sample()
+            self.gwData = goodweData.goodweData( sample)
+	    return self.gwData.get_sample()
          except:
             tries += 1
             if tries > 3:
@@ -57,6 +59,13 @@ class readGoodwe( iGoodwe.iGoodwe) :
                raise ValueError
 
          
+   #--------------------------------------------------------------------------
+   def is_online( self):
+      '''Is online?'''
+      if self.gwData:
+         return self.gwData.is_online()
+      else:
+         return False
       
    #--------------------------------------------------------------------------
    def _read_data( self, url):
