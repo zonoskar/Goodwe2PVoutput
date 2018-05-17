@@ -32,10 +32,10 @@ class goodweData :
       self.m_sample.set_error( filteredData[8])
 
       #Values that I'm not using (or don't know what they are
-      self.m_sample.set_vbattery( filteredData[15].replace(' ', ''))
-      self.m_sample.set_ibattery( filteredData[16].replace(' ', ''))
-      self.m_sample.set_soc( filteredData[17].replace(' ', ''))
-      self.m_sample.set_load( filteredData[18].replace(' ', ''))
+  #    self.m_sample.set_vbattery( filteredData[15].replace(' ', ''))
+  #    self.m_sample.set_ibattery( filteredData[16].replace(' ', ''))
+  #    self.m_sample.set_soc( filteredData[17].replace(' ', ''))
+  #    self.m_sample.set_load( filteredData[18].replace(' ', ''))
 
       self.m_sample.set_pgrid( self._convert_line_to_float(filteredData[4]))
       self.m_sample.set_eday( self._convert_line_to_float(filteredData[5]))
@@ -107,7 +107,7 @@ class goodweData :
             line=line.replace('\r', '')
             l.append(line)
 	    
-      if len(l) != 21:
+      if len(l) != 17:
           print title
           print "Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l)
 	  
