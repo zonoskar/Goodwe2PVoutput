@@ -70,8 +70,8 @@ class goodweData :
          for frac in range(len(f)):
             self.m_sample.set_fac( frac, self._convert_line_to_float(f[frac]))
 
-      self.m_sample.set_consume_day( self._convert_line_to_float(filteredData[19]))
-      self.m_sample.set_consume_total( self._convert_line_to_float(filteredData[20]))
+      self.m_sample.set_consume_day( self._convert_line_to_float(filteredData[15]))
+      self.m_sample.set_consume_total( self._convert_line_to_float(filteredData[16]))
 
       # Calculate efficiency (PowerAC / powerDC)
       try:
