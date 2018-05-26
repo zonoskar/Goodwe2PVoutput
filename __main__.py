@@ -2,6 +2,8 @@ import readGoodwe
 import goodweConfig
 import goodweData
 import goodweUsb
+import goodweRS485
+import goodweWIFI
 import pvoutput
 import csvoutput
 import processData
@@ -54,20 +56,6 @@ if __name__ == "__main__":
                                  config.get_pvoutput_api())
    csv = csvoutput.csvoutput( config.get_csv_dir(), 'Goodwe_PV_data')
 
-   if config.get_input_source() == 'URL':
-      goodwe = readGoodwe.readGoodwe( config.get_goodwe_url(), 
-                                      config.get_goodwe_loginUrl(), 
-                                      config.get_goodwe_system_id())
-      # Request password for Goodwe-power.com
-      passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
-      password = getpass.getpass( passwd_text)
-      goodwe.login( config.get_goodwe_user_id(), password)
-   
-      if config.get_spline_fit():
-         process = processData2.processData2( pvoutput)
-      else:
-         process = processData.processData( pvoutput)
-      
    if config.get_input_source() == 'USB':
       goodwe = goodweUsb.goodweUsb( '', ' ', 0x0084)
       try:
@@ -78,6 +66,49 @@ if __name__ == "__main__":
          print "Connect USB cable to the inverter please or wait until the inverter is online"
 
       process = processNone.processNone( pvoutput)
+
+   elif config.get_input_source() == 'RS485':
+      goodwe = goodweRS485.goodweRS485( '', 
+                                        config.get_serial_device(), 
+                                        config.get_serial_baudrate())
+      try:
+         goodwe.initialize()
+         print "RS485 connection initialized"
+      except Exception, ex:
+         print ex
+         print "Connect RS485 cable to the inverter please or wait until the inverter is online"
+
+      process = processNone.processNone( pvoutput)
+
+   elif config.get_input_source() == 'WIFI':
+      goodwe = goodweWIFI.goodweWIFI(   config.get_wifi_address(), 
+                                        '', 
+                                        config.get_serial_baudrate())
+      try:
+         goodwe.initialize()
+         print "WIFI connection initialized"
+      except Exception, ex:
+         print ex
+         print "Connect WIFI cable to the inverter please or wait until the inverter is online"
+
+      process = processNone.processNone( pvoutput)
+
+   else: # config.get_input_source() == 'URL':
+      goodwe = readGoodwe.readGoodwe( config.get_goodwe_url(), 
+                                      config.get_goodwe_loginUrl(), 
+                                      config.get_goodwe_system_id())
+      # Request password for Goodwe-power.com
+      password = config.get_goodwe_passwd()
+      if password == '':
+         passwd_text = 'Supply password for ' + str(config.get_goodwe_loginUrl()) + ': '
+         password = getpass.getpass( passwd_text)
+      goodwe.login( config.get_goodwe_user_id(), password)
+   
+      if config.get_spline_fit():
+         process = processData2.processData2( pvoutput)
+      else:
+         process = processData.processData( pvoutput)
+      
 
    # Perform main loop
    mainloop( goodwe, pvoutput, csv, process)

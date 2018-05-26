@@ -34,23 +34,25 @@ Usage:
 Create a configuration file named .goodwe2pvoutput in your home directory
 indicated by the $HOME environment variable. This file must contain the
 following information (replace text between '' by your information, the order 
-is not important):
+is not important). An example file is found in the data directory in the GIT repository:
 
 goodwe_system_id: 'Your Goodwe system ID'
 
 goodwe_user_id: 'Your username on goodwe-power.com'
 
+goodwe_server: 'The Goodwe server you are using, eu, au or www
+
+goodwe_passwd: 'This is optional. If supplied, the script won't ask for the password at startup. But be ware it is stored in plain text, so make sure only you are able to read the file. (perform 'chmod a-r <config file>' on the config file).
+
 pvoutput_system_id: 'Your PVOutput system ID'
 
 pvoutput_api: 'Your PVOutput API key'
 
-csv_dir: 'Path where the CSV files are stored'
+csv_dir: 'Path where the CSV files are stored. This path must exist and be readable.'
 
 spline_fit: 'True or False. When True, the new spline fit smooths the data sent to PVoutput'
 
-inpout_source: 'URL or USB. When USB, the data will be read from the USB port of the inverter, but this
-                option doesn't work yet. When URL, it scrapes data from the Goodwe-power.com site. This is
-                the preferred option that does work.'
+input_source: 'URL or USB. When USB, the data will be read from the USB port of the inverter, but this option doesn't work yet. When URL, it scrapes data from the Goodwe-power.com site. This is the preferred option that does work.'
 
 The character '#' can be used to denote comments, from this character to the
 end of the line will be ignored. An example is provided in the data direcotry.
