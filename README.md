@@ -10,6 +10,7 @@ Python modules needed (most of them are standard, the install command is given w
 - enum
 - numpy (pip install numpy)
 - requests (pip install requests)
+- serial (pip install pyserial)
 
 
 Script to upload Goodwe power invertor data to PVoutput website. Now also logs extended data to PVoutput:
