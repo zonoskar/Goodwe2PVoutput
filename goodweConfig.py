@@ -77,10 +77,12 @@ class goodweConfig :
       print self.CSV_DIR + " (" + self.csv_dir + ")"
       print self.SPLINE_FIT + " (" + str(self.spline_fit) + ")"
       print self.INPUT_SOURCE + " (" + str(self.input_source) + ")"
-      print self.SERIAL_BAUDRATE + " (" + str(self.serial_baudrate) + ")"
-      print self.SERIAL_DEVICE + " (" + str(self.serial_device) + ")"
-      print self.WIFI_ADDRESS + " (" + str(self.wifi_address) + ")"
-      
+      try:
+         print self.SERIAL_BAUDRATE + " (" + str(self.serial_baudrate) + ")"
+         print self.SERIAL_DEVICE + " (" + str(self.serial_device) + ")"
+         print self.WIFI_ADDRESS + " (" + str(self.wifi_address) + ")"
+      except:
+         pass
             
    #--------------------------------------------------------------------------
    def get_goodwe_system_id( self):
