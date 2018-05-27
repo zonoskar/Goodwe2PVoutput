@@ -42,7 +42,7 @@ goodwe_user_id: 'Your username on goodwe-power.com'
 
 goodwe_server: 'The Goodwe server you are using, eu, au or www
 
-goodwe_passwd: 'This is optional. If supplied, the script won't ask for the password at startup. But be ware it is stored in plain text, so make sure only you are able to read the file. (perform 'chmod a-r <config file>' on the config file).
+goodwe_passwd: 'This is optional. If supplied, the script won't ask for the password at startup. But be ware it is stored in plain text, so make sure only you are able to read the file. (perform 'chmod 600 <config file>' on the config file).
 
 pvoutput_system_id: 'Your PVOutput system ID'
 
