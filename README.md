@@ -60,6 +60,7 @@ end of the line will be ignored. An example is provided in the data direcotry.
 
 Make sure the file is readable by everyone.
 
+For USB access, change the USB permission according to this site: http://ask.xmodulo.com/change-usb-device-permission-linux.html
 
 Start:
 python -m Goodwe2PVoutput
