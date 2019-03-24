@@ -76,12 +76,12 @@ class goodweRS485( iGoodwe.iGoodwe) :
                              FC.result_stt:   self._skip_message}
 
       self.state_switch = { State.OFFLINE:    self.initialize,
-			    State.CONNECTED:  self._remove_registration,
-			    State.DISCOVER:   self._discover_goodwe,
-			    State.ALLOC:      self._alloc_register,
-			    State.ALLOC_CONF: self._read_data_goodwe,
-			    State.ALLOC_ASK:  self._read_data_init,
-			    State.RUNNING:    self._read_data }
+                            State.CONNECTED:  self._remove_registration,
+                            State.DISCOVER:   self._discover_goodwe,
+                            State.ALLOC:      self._alloc_register,
+                            State.ALLOC_CONF: self._read_data_goodwe,
+                            State.ALLOC_ASK:  self._read_data_init,
+                            State.RUNNING:    self._read_data }
 
 
    #--------------------------------------------------------------------------
@@ -427,7 +427,7 @@ class goodweRS485( iGoodwe.iGoodwe) :
       print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
       if self.m_inverter_adr_confirmed:
          self._goodwe_send( self.m_inverter_adr, CC.read, FC.query, 0)
-	 return True
+         return True
       else:
          raise IOError("Inverter not online, or address unkown. Cannot read.")
 

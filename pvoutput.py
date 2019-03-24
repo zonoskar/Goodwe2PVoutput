@@ -27,9 +27,9 @@ class pvoutput :
       for i in xrange(3):
          v = gw.get_vac(i)
          if v > 0:
-	    vac = vac + v
-	    vs = vs + 1
-	    
+            vac = vac + v
+            vs = vs + 1
+            
       if vs > 0:
          vac = vac / vs
       
@@ -42,12 +42,12 @@ class pvoutput :
               'v2' : str(gw.get_pgrid()),
               'v5' : str(gw.get_temperature()),
               'v6' : str(gw.get_vpv(0) + gw.get_vpv(1)),
-	      'v7' : str(gw.get_vpv(0)),
-	      'v8' : str(gw.get_vpv(1)),
-	      'v9' : str(p1),
-	      'v10' : str(p2),
-	      'v11' : str(vac),
-	      'v12' : str(gw.get_efficiency())}
+              'v7' : str(gw.get_vpv(0)),
+              'v8' : str(gw.get_vpv(1)),
+              'v9' : str(p1),
+              'v10' : str(p2),
+              'v11' : str(vac),
+              'v12' : str(gw.get_efficiency())}
       try:
          r = requests.post(self.m_url, headers=header, data=post, timeout=20)
       except Exception, arg:

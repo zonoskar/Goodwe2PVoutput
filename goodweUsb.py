@@ -111,6 +111,7 @@ class goodweUsbWorker( threading.Thread):
       self.m_comms = goodweUsbComms( gpio_pin, '', usb_id)
       self.m_lock = threading.Lock()
       self.m_readError = True
+      print "Init USB thread worker at " + str(interval) + " Hz."
 
    #--------------------------------------------------------------------------
    def run( self):
@@ -120,6 +121,7 @@ class goodweUsbWorker( threading.Thread):
          try:
             self.m_lock.acquire()
             sample = self.m_comms.get_sample()
+            print sample.to_string()
             self.m_readError = False
             if t2 != 0:
                sample.add_eday_calc( sample.get_pgrid()/1000.0, t - t2)

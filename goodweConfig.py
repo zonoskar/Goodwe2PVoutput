@@ -32,49 +32,49 @@ class goodweConfig :
       
       with open( configFile) as fp:
          for line in fp:
-	    line = line[:line.find('#')]
-	    line = line.replace(' ', '')
-	    line = line.replace('=', '')
-	    line = line.replace(':', '')
-	    line = line.replace('\'', '')
-	    
-	    if self.GOODWE_SYSTEM_ID in line:
-	       self.goodwe_system_id = line.replace(self.GOODWE_SYSTEM_ID, '')
-	    if self.GOODWE_USER_ID in line:
-	       self.goodwe_user_id = line.replace(self.GOODWE_USER_ID, '')
-	    if self.GOODWE_PASSWD in line:
-	       self.goodwe_passwd = line.replace(self.GOODWE_PASSWD, '')
-	    if self.GOODWE_SERVER in line:
-	       self.goodwe_server = line.replace(self.GOODWE_SERVER, '')
-	    if self.PVOUTPUT_SYSTEM_ID in line:
-	       self.pvoutput_system_id = line.replace(self.PVOUTPUT_SYSTEM_ID, '')
-	    if self.PVOUTPUT_API in line:
-	       self.pvoutput_api = line.replace(self.PVOUTPUT_API, '')
-	    if self.CSV_DIR in line:
-	       self.csv_dir = line.replace(self.CSV_DIR, '')
-	    if self.SPLINE_FIT in line:
+            line = line[:line.find('#')]
+            line = line.replace(' ', '')
+            line = line.replace('=', '')
+            line = line.replace(':', '')
+            line = line.replace('\'', '')
+            
+            if self.GOODWE_SYSTEM_ID in line:
+               self.goodwe_system_id = line.replace(self.GOODWE_SYSTEM_ID, '')
+            if self.GOODWE_USER_ID in line:
+               self.goodwe_user_id = line.replace(self.GOODWE_USER_ID, '')
+            if self.GOODWE_PASSWD in line:
+               self.goodwe_passwd = line.replace(self.GOODWE_PASSWD, '')
+            if self.GOODWE_SERVER in line:
+               self.goodwe_server = line.replace(self.GOODWE_SERVER, '')
+            if self.PVOUTPUT_SYSTEM_ID in line:
+               self.pvoutput_system_id = line.replace(self.PVOUTPUT_SYSTEM_ID, '')
+            if self.PVOUTPUT_API in line:
+               self.pvoutput_api = line.replace(self.PVOUTPUT_API, '')
+            if self.CSV_DIR in line:
+               self.csv_dir = line.replace(self.CSV_DIR, '')
+            if self.SPLINE_FIT in line:
                self.spline_fit = line.replace(self.SPLINE_FIT, '') == "True"
-	    if self.INPUT_SOURCE in line:
+            if self.INPUT_SOURCE in line:
                self.input_source = line.replace(self.INPUT_SOURCE, '')
-	    if self.SERIAL_BAUDRATE in line:
+            if self.SERIAL_BAUDRATE in line:
                self.serial_baudrate = line.replace(self.SERIAL_BAUDRATE, '')
-	    if self.SERIAL_DEVICE in line:
+            if self.SERIAL_DEVICE in line:
                self.serial_device = line.replace(self.SERIAL_DEVICE, '')
-	    if self.WIFI_ADDRESS in line:
+            if self.WIFI_ADDRESS in line:
                self.wifi_address = line.replace(self.WIFI_ADDRESS, '')
-	    if self.GPIO_USB_PIN in line:
+            if self.GPIO_USB_PIN in line:
                self.gpio_usb_pin = line.replace(self.GPIO_USB_PIN, '')
-	    if self.GPIO_FAN_V1 in line:
+            if self.GPIO_FAN_V1 in line:
                self.gpio_fan_V1 = line.replace(self.GPIO_FAN_V1, '')
-	    if self.TEMP_MONITOR in line:
+            if self.TEMP_MONITOR in line:
                self.temp_monitor = line.replace(self.TEMP_MONITOR, '')
-	    if self.GPIO_FAN_V2 in line:
+            if self.GPIO_FAN_V2 in line:
                self.gpio_fan_V2 = line.replace(self.GPIO_FAN_V2, '')
-	    if self.GPIO_FAN_ON1 in line:
+            if self.GPIO_FAN_ON1 in line:
                self.gpio_fan_on1 = line.replace(self.GPIO_FAN_ON1, '')
-	    if self.GPIO_FAN_ON2 in line:
+            if self.GPIO_FAN_ON2 in line:
                self.gpio_fan_on2 = line.replace(self.GPIO_FAN_ON2, '')
-	    if self.USB_SAMPLE_INTERVAL in line:
+            if self.USB_SAMPLE_INTERVAL in line:
                self.usb_sample_interval = float(line.replace(self.USB_SAMPLE_INTERVAL, ''))
 
 

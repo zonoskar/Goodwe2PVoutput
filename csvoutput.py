@@ -18,10 +18,10 @@ class csvoutput :
       
       if not (os.path.exists( dirname) and os.path.isdir( dirname)):
          try:
-	    os.makedirs(dirname)
-	 except Exception, ex:
-	    print "CSV logging has been disabled because dir %s could not be created (%s)" % (dirname, ex)
-	    self.csv_logging_enabled = False
+            os.makedirs(dirname)
+         except Exception, ex:
+            print "CSV logging has been disabled because dir %s could not be created (%s)" % (dirname, ex)
+            self.csv_logging_enabled = False
       self.m_filename = dirname + filename
       self.m_write_header = True
 
@@ -41,7 +41,7 @@ class csvoutput :
                if self.m_write_header:
                   fs.write( pvout.get_csv_header() + '\n')
                   # next time, no need for a header
-	          self.m_write_header = False
+                  self.m_write_header = False
                fs.write( dateString + pvout.to_csv_string() + '\n')
          except Exception, arg:
             print "Write CSV data Error: " + str(arg)
