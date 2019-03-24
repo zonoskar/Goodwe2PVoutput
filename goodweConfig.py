@@ -101,15 +101,15 @@ class goodweConfig :
       print self.CSV_DIR + " (" + self.csv_dir + ")"
       print self.SPLINE_FIT + " (" + str(self.spline_fit) + ")"
       print self.INPUT_SOURCE + " (" + str(self.input_source) + ")"
-      print self.GPIO_USB_PIN + " (" + str(self.gpio_usb_pin) + ")"
-      print self.USB_SAMPLE_INTERVAL + " (" + str(self.usb_sample_interval) + ")"
-      print self.TEMP_MONITOR + " (" + str(self.temp_monitor) + ")"
-      print "FAN pins: (" + str(self.gpio_fan_V1) + ", " + str(self.gpio_fan_V2) + ", " + str(self.gpio_fan_on1) + ", " + str(self.gpio_fan_on2) + ")"
       
       try:
          print self.SERIAL_BAUDRATE + " (" + str(self.serial_baudrate) + ")"
          print self.SERIAL_DEVICE + " (" + str(self.serial_device) + ")"
          print self.WIFI_ADDRESS + " (" + str(self.wifi_address) + ")"
+         print self.GPIO_USB_PIN + " (" + str(self.gpio_usb_pin) + ")"
+         print self.USB_SAMPLE_INTERVAL + " (" + str(self.usb_sample_interval) + ")"
+         print self.TEMP_MONITOR + " (" + str(self.temp_monitor) + ")"
+         print "FAN pins: (" + str(self.gpio_fan_V1) + ", " + str(self.gpio_fan_V2) + ", " + str(self.gpio_fan_on1) + ", " + str(self.gpio_fan_on2) + ")"
       except:
          pass
             
