@@ -5,18 +5,19 @@ class goodweSample :
 
    #--------------------------------------------------------------------------
    def __init__( self):
-   #Initialization of the goodweData class. All data members are set
+   #Initialization of the goodweSample class. All data members are set
    #to default values. Then the urlData is filtered and parsed
       self.m_line = ''
       self.m_inverter_sn = ''
       self.m_description = ''
-      self.m_inverter_status = ''
+      self.m_inverter_status = 'offline'
       self.m_error = ''
       self.m_vbattery = ''
       self.m_ibattery = ''
       self.m_soc = ''
       self.m_pgrid = 0.0
       self.m_eday = 0.0
+      self.m_eday_calc = 0.0
       self.m_etotal = 0.0
       self.m_htotal = 0.0
       self.m_temperature = 0.0
@@ -43,10 +44,16 @@ class goodweSample :
 
 
    #--------------------------------------------------------------------------
+   def to_calc_string( self):
+   #Creates a string repesentation of the class
+   #
+      return " P:" + str(self.m_pgrid) + " Ec:" + str(self.m_eday_calc) + " E:" + str(self.m_eday) + " V:" + str(self.m_vpv[0]+self.m_vpv[1])
+
+   #--------------------------------------------------------------------------
    def to_short_string( self):
    #Creates a string repesentation of the class
    #
-      return "S/N: " + str(self.m_inverter_sn) + " P:" + str(self.m_pgrid) + " E:" + str(self.m_eday) + " V:" + str(self.m_vpv[0]+self.m_vpv[1])
+      return " P:" + str(self.m_pgrid) + " E:" + str(self.m_eday) + " V:" + str(self.m_vpv[0]+self.m_vpv[1]) + " T:" + str(self.m_temperature)
 
 
    #--------------------------------------------------------------------------
@@ -75,14 +82,15 @@ class goodweSample :
    #Creates a detailed string repesentation of the class
    #
       s = 'Goodwe sample for inverter '
-      s = s + "S/N:    " + str(self.m_inverter_sn) + "\n"
-      s = s + "Desc:   " + str(self.m_description) + "\n"
-      s = s + "Status: " + str(self.m_inverter_status) + "\n"
-      s = s + "Pgrid:  " + str(self.m_pgrid) + "\n"
-      s = s + "Eday:   " + str(self.m_eday) + "\n"
-      s = s + "Etotal: " + str(self.m_etotal) + "\n"
-      s = s + "Htotal: " + str(self.m_htotal) + "\n"
-      s = s + "Error:  " + str(self.m_error) + "\n"
+      s = s + "S/N:     " + str(self.m_inverter_sn) + "\n"
+      s = s + "Desc:    " + str(self.m_description) + "\n"
+      s = s + "Status:  " + str(self.m_inverter_status) + "\n"
+      s = s + "Pgrid:   " + str(self.m_pgrid) + "\n"
+      s = s + "Eday:    " + str(self.m_eday) + "\n"
+      s = s + "EdayCalc:" + str(self.m_eday_calc) + "\n"
+      s = s + "Etotal:  " + str(self.m_etotal) + "\n"
+      s = s + "Htotal:  " + str(self.m_htotal) + "\n"
+      s = s + "Error:   " + str(self.m_error) + "\n"
       s = s + "Vpv0:  " + str(self.m_vpv[0]) + "\n"
       s = s + "Vpv1:  " + str(self.m_vpv[1]) + "\n"
       s = s + "Ipv0:  " + str(self.m_ipv[0]) + "\n"
@@ -113,7 +121,7 @@ class goodweSample :
    #--------------------------------------------------------------------------
    def is_identical( self, gw):
    #Compares select data members to determine if two instances of the
-   #goodweData class are identical
+   #goodweSample class are identical
    #
       eps = 0.05
       if not gw:
@@ -160,13 +168,19 @@ class goodweSample :
       isample.set_fac(2, (self.get_fac(2) + sample.get_fac(2)) / 2)
       isample.set_pgrid( (self.get_pgrid() + sample.get_pgrid()) / 2)
       isample.set_eday( (self.get_eday() + sample.get_eday()) / 2)
+      isample.set_eday_calc( (self.get_eday_calc() + sample.get_eday_calc()) / 2)
       isample.set_etotal( (self.get_etotal() + sample.get_etotal()) / 2)
       isample.set_htotal( (self.get_htotal() + sample.get_htotal()) / 2)
       isample.set_temperature( (self.get_temperature() + sample.get_temperature()) / 2)
       isample.set_efficiency( (self.get_efficiency() + sample.get_efficiency()) / 2)
       
       return isample
-      
+
+   #--------------------------------------------------------------------------
+   def is_online( self):
+   #
+      return ((self.is_inverter_status('Normal')) and (abs(self.get_vpv(0)+self.get_vpv(1)) > 0.01))
+            
 
    #--------------------------------------------------------------------------
    def is_inverter_status( self, status):
@@ -220,6 +234,8 @@ class goodweSample :
 
    def get_eday( self):
       return self.m_eday
+   def get_eday_calc( self):
+      return self.m_eday_calc
 
    def get_etotal( self):
       return self.m_etotal
@@ -287,6 +303,10 @@ class goodweSample :
 
    def set_eday( self, val):
       self.m_eday = val
+   def set_eday_calc( self, val):
+      self.m_eday_calc = val
+   def add_eday_calc( self, val, seconds):
+      self.m_eday_calc += val * (seconds / 3600.0)
 
    def set_etotal( self, val):
       self.m_etotal = val

@@ -1,3 +1,4 @@
+import time
 
 class processData :
    BUFFERING = 'BUFFERING'
@@ -49,14 +50,16 @@ class processData :
    #
       if self.m_pvoutput:
          self.m_pvoutput.post_data( self.m_prev_sample)
-      print "Logging: " + self.m_prev_sample.to_short_string()
+      t = time.localtime(time.time())
+      print "Logging:   " + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + "h " + self.m_prev_sample.to_short_string()
       
       
    #--------------------------------------------------------------------------
    def buffering( self, sample):
    # Processes the BUFFERING state. Basically does nothing.
    #
-      print "Buffering: " + sample.to_short_string()
+      t = time.localtime(time.time())
+      print "Buffering: " + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + "h " + sample.to_short_string()
       
       
    #--------------------------------------------------------------------------
@@ -66,7 +69,8 @@ class processData :
       sample1 = sample.interpolate( self.m_prev_sample)
       if self.m_pvoutput:
          self.m_pvoutput.post_data( sample1)
-      print "Interpolate: " + sample1.to_short_string()
+      t = time.localtime(time.time())
+      print "Interpol.: " + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + "h " + sample1.to_short_string()
       self.m_state = self.LOG_PREV_DIFF
 
       

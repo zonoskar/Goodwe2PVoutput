@@ -4,11 +4,12 @@ import copy
 import time
 import zlib
 import enum
+import threading
 
 import testUsb
 import goodweSample
 import iGoodwe
-
+import gpio
 
 class State( enum.Enum):
    OFFLINE = 1
@@ -18,6 +19,7 @@ class State( enum.Enum):
    ALLOC_CONF = 5
    ALLOC_ASK = 6
    RUNNING = 7
+   STOP = 8
 
 class CC:
    reg  = 0x00
@@ -40,11 +42,134 @@ class FC:
    result_id  = 0x82
    result_stt = 0x83
 
-
 class goodweUsb( iGoodwe.iGoodwe) :
 
    #--------------------------------------------------------------------------
-   def __init__(self, url, login_url, station_id):
+   def __init__(self, gpio_pin, usb_sample_interval, station_id):
+      '''Initialisation of the goodweUsb class. All data members are set
+         to default values. '''
+      self.subscribers= []
+      self.m_gpio_pin = gpio_pin
+      self.m_station_id = station_id
+      self.m_sample_interval = usb_sample_interval
+      self.m_worker = None
+      
+   #--------------------------------------------------------------------------
+   def initialize( self):
+      '''Initialize the USB port'''
+      self.m_stop = False
+      self.m_worker = goodweUsbWorker( 1, "worker", self.m_gpio_pin, self.m_station_id, self.m_sample_interval)
+      print "Starting worker thread from goodweUsb"
+      self.m_worker.start()
+      return False
+
+   #--------------------------------------------------------------------------
+   def terminate( self):
+      '''Terminate the USB port'''
+      self.m_stop = True
+      if self.m_worker:
+         print "Stopping worker thread"
+         self.m_worker.stop()
+      
+   #--------------------------------------------------------------------------
+   def subscribe_temperature( self, method):
+   #Subscribes method to the temperature value.
+   #
+      self.subscribers.append( method)
+   
+   #--------------------------------------------------------------------------
+   def is_online( self):
+   #TRUE when the GoodWe inverter returns the correct status
+   #
+      if self.m_worker and self.m_worker.is_online():
+         sample = self.m_worker.get_current_value()
+         return sample.is_online()
+      else:
+         return False
+
+   #--------------------------------------------------------------------------
+   def read_sample_data( self):
+      '''Read a data sample.'''
+      if self.m_worker and self.m_worker.is_online():
+         sample = self.m_worker.get_current_value()
+         for subscriber in self.subscribers:
+            subscriber( sample.get_temperature())
+         return sample
+      else:
+         return goodweSample.goodweSample()
+
+
+class goodweUsbWorker( threading.Thread):
+   #--------------------------------------------------------------------------
+   def __init__(self, threadId, name, gpio_pin, usb_id, interval):
+      threading.Thread.__init__(self)
+      self.m_threadId = threadId
+      self.m_name = name
+      self.m_sample_interval = interval
+      self.m_current_value = goodweSample.goodweSample()
+      self.m_stop = False
+      self.m_comms = goodweUsbComms( gpio_pin, '', usb_id)
+      self.m_lock = threading.Lock()
+      self.m_readError = True
+
+   #--------------------------------------------------------------------------
+   def run( self):
+      t2 = 0
+      while not self.m_stop:
+         t = time.time()
+         try:
+            self.m_lock.acquire()
+            sample = self.m_comms.get_sample()
+            self.m_readError = False
+            if t2 != 0:
+               sample.add_eday_calc( sample.get_pgrid()/1000.0, t - t2)
+            else:
+               sample.set_eday_calc( sample.get_eday())
+            self.m_current_value = sample
+            self.m_lock.release()
+            self.sleep(self.m_sample_interval - (time.time() - t))
+            t2 = t
+         except Exception, ex:
+            # make sure the eday to pvoutput matches the inverter
+            self.m_current_value.set_eday_calc( self.m_current_value.get_eday())
+            self.m_lock.release()
+            self.m_readError = True
+#            print str(ex) + " in 10 minutes"
+            for i in xrange(600):
+               time.sleep(1)
+               if self.m_stop:
+                  break
+            t2 = 0
+      print "Terminated worker thread"
+      self.m_comms.terminate()
+
+   #--------------------------------------------------------------------------
+   def stop( self):
+      print "Stopping"
+      self.m_stop = True
+      self.m_comms.stop()
+      
+   #--------------------------------------------------------------------------
+   def get_current_value( self):
+      self.m_lock.acquire()
+      sample = self.m_current_value
+      sample.set_eday( sample.get_eday_calc())
+      self.m_lock.release()
+      return sample
+   
+   #--------------------------------------------------------------------------
+   def is_online( self):
+      return not self.m_readError
+
+   #--------------------------------------------------------------------------
+   def sleep( self, seconds):
+      if seconds > 0:
+         time.sleep( seconds)
+      
+class goodweUsbComms :
+
+   #--------------------------------------------------------------------------
+   def __init__(self, usb_pin, emulated, usb_id):
       '''Initialisation of the goodweUsb class. All data members are set
          to default values. '''
       self.m_sample = goodweSample.goodweSample()
@@ -53,104 +178,42 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_serialBuffer = ''
       self.m_inverter_adr = 0x11
       self.m_inverter_adr_confirmed = False
-      self.m_deviceId = station_id
+      self.m_deviceId = usb_id
       self.m_dev = None
       self.m_epi = None
       self.m_initialized = False
-      self.m_emulated = "test" in url
-
-      self.cc_reg_switch  = {FC.offline:      self._skip_message,
+      self.m_emulated = "test" in emulated
+      try:
+         self.m_relay = gpio.usb_relay( usb_pin)
+      except:
+         exit(-1)
+         
+      self.cc_reg_switch  = {FC.offline:      self._skip_reg_message,
                              FC.regreq:       self._reg_received_registration,
-                             FC.allocreg:     self._skip_message,
+                             FC.allocreg:     self._skip_reg_message,
                              FC.addconf:      self._reg_received_confirm_registration,
-                             FC.remreg:       self._skip_message,
+                             FC.remreg:       self._skip_reg_message,
                              FC.remconf:      self._reg_received_confirm_removal}
 
-      self.cc_read_switch = {FC.query:        self._skip_message,
+      self.cc_read_switch = {FC.query:        self._skip_read_message,
                              FC.result:       self._read_received_message,
-                             FC.query_id:     self._skip_message,
-                             FC.result_id:    self._skip_message,
-                             FC.query_stt:    self._skip_message,
-                             FC.result_stt:   self._skip_message}
+                             FC.query_id:     self._skip_read_message,
+                             FC.result_id:    self._skip_read_message,
+                             FC.query_stt:    self._skip_read_message,
+                             FC.result_stt:   self._skip_read_message}
 
-      self.state_switch = { State.OFFLINE:    self.initialize,
-			    State.CONNECTED:  self._remove_registration,
-			    State.DISCOVER:   self._discover_goodwe,
-			    State.ALLOC:      self._alloc_register,
-			    State.ALLOC_CONF: self._read_data_goodwe,
-			    State.ALLOC_ASK:  self._read_data_init,
-			    State.RUNNING:    self._read_data }
-
-# Initialize message buffer
-#      [0xCC,0x99,0x09,0xAA,0x55,0x80,0x7F,0x00,
-#       0x00,0x00,0x01,0xFE,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00])
-
-# Init Ack message buffer
-#      [0xCC,0x99,0x1A,0xAA,0x55,0x80,0x7F,0x00,
-#       0x01,0x11,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x11,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00])
-
-# Data message buffer
-#      [0xCC,0x99,0x09,0xAA,0x55,0x80,0x11,0x01,
-#       0x01,0x00,0x01,0x92,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-#       0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00])
+      self.state_switch = { State.OFFLINE:    self._offline,
+                            State.CONNECTED:  self._remove_registration,
+                            State.DISCOVER:   self._discover_goodwe,
+                            State.ALLOC:      self._alloc_register,
+                            State.ALLOC_CONF: self._read_data_goodwe,
+                            State.ALLOC_ASK:  self._read_data_init,
+                            State.RUNNING:    self._read_data }
 
 
    #--------------------------------------------------------------------------
-   def initialize( self):
-      '''Initialize the USB port'''
-      tries = 0
-      self.m_initialized = False
-      self.m_state = State.OFFLINE
-
-      print "Emulation active: " + str(self.m_emulated)
-      try:
-         self._terminate_usb()
-      except:
-         pass
-
-      time.sleep(3)
-
-      try:
-         self._usb_init()
-      except Exception, ex:
-         raise IOError("Cannot initialize USB port: " + str(ex))
-      else:
-         self.m_initialized = True
-         self.m_state = State.CONNECTED
-
-      return False
-
-   #--------------------------------------------------------------------------
-   def is_online( self):
-   #TRUE when the GoodWe inverter returns the correct status
-   #
-      return ((self.m_sample.is_inverter_status('Normal')) and (abs(self.m_sample.get_vpv(0)+self.m_sample.get_vpv(1)) > 0.01))
-
-
-   #--------------------------------------------------------------------------
-   def read_sample_data( self):
+   def get_sample( self):
       '''Read a data sample.'''
-      print "Read sample data. State=" + str(self.m_state)
       tries = 0
       sample_read = False
       while not sample_read:
@@ -159,71 +222,80 @@ class goodweUsb( iGoodwe.iGoodwe) :
             if expectAnswer:
                sample_read = self._read_data_goodwe()
          except Exception, ex:
-            print "Exception found: " +str(ex)
             if tries < 10:
-               self.m_state = State.CONNECTED
                tries+=1
             else:
+               self.m_state = State.OFFLINE
+               tries = 0
+               self.m_relay.disable()
                raise IOError( "Cannot read from GoodweUSB in state %s: %s" % (str(self.m_state), str(ex)))
 
       return self.m_sample
-
+      
+   #--------------------------------------------------------------------------
+   def stop( self):
+      self.m_state = State.STOP
+      
    #--------------------------------------------------------------------------
    # internal functions
    #--------------------------------------------------------------------------
-   def _usb_init( self):
+   def usb_init( self):
       '''This initialises the USB device'''
       if self.m_emulated:
          self.m_dev = testUsb.testUsb( self.m_deviceId)
       else:
-         print "find USB connection"
+         self.m_relay.enable()
+         time.sleep(2)
          self.m_dev = usb.core.find(idVendor = self.m_deviceId)
+         print self.m_dev
 
       if self.m_dev:
          self.m_dev.reset()
-      else:
-         raise ValueError('Device for vendor GoodWe (vendor ID %s) not found' % str(hex(self.m_deviceId)))
+         if self.m_dev.is_kernel_driver_active(0):
+            self.m_dev.detach_kernel_driver(0)
+         try:
+            self.m_dev.set_configuration()
+         except:
+            self.m_relay.disable()
+            raise ValueError('Error setting USB configuration')
 
-      if self.m_dev.is_kernel_driver_active(0):
-         print "Need to detach kernel driver."
-         self.m_dev.detach_kernel_driver(0)
-         print "Claiming device."
-      try:
-         print "Setting default USB configuration."
-         self.m_dev.set_configuration()
-      except:
-         raise ValueError('Error setting USB configuration')
+         try:
+            if not self.m_emulated:
+               usb.util.claim_interface( self.m_dev, 0)
+         except:
+            self.m_relay.disable()
+            raise ValueError('Error claiming USB interface')
 
-      try:
-         print "Claiming USB interface."
+         cfg = self.m_dev.get_active_configuration()
          if not self.m_emulated:
-	    usb.util.claim_interface( self.m_dev, 0)
-      except:
-         raise ValueError('Error claiming USB interface')
+            intf = cfg[(0, 0)]
+            print "INTERFACE:"
+            print intf
 
-      print "Getting active USB configuration."
-      cfg = self.m_dev.get_active_configuration()
-      if not self.m_emulated:
-         intf = cfg[(0, 0)]
-         print intf
+            # get the BULK IN descriptor
+            self.m_epi = usb.util.find_descriptor(
+               intf,
+               # match our first out endpoint
+               custom_match= \
+                  lambda e: \
+                    usb.util.endpoint_direction(e.bEndpointAddress) == \
+                    usb.util.ENDPOINT_IN)
+      else:
+         self.m_relay.disable()
+         print "Device for vendor GoodWe (vendor ID %s) not found" % str(hex(self.m_deviceId))
 
-         # get the BULK IN descriptor
-         self.m_epi = usb.util.find_descriptor(
-            intf,
-            # match our first out endpoint
-            custom_match= \
-               lambda e: \
-                 usb.util.endpoint_direction(e.bEndpointAddress) == \
-                 usb.util.ENDPOINT_IN)
 
    #--------------------------------------------------------------------------
    def _terminate_usb( self):
       '''This terminates the USB driver'''
       if not self.m_emulated:
-         usb.util.dispose_resources( self.m_dev)
+         if self.m_dev:
+            usb.util.dispose_resources( self.m_dev)
       self.m_dev = None
       self.m_epi = None
       self.m_initialized = False
+      self.m_relay.disable()
+
 
    #--------------------------------------------------------------------------
    def _read_data_goodwe( self):
@@ -253,7 +325,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
                         dataLen -= 1
 
                   if dataPtr >= 5 and dataLen == 0:
-                     self._hexprint("inBuffer:", inBuffer)
+#                     self._hexprint("inBuffer:", inBuffer)
                      startFound = False
                      sample_read = self._check_crc_and_update_state( inBuffer)
                      more = False
@@ -267,9 +339,8 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
                lastByte = byte
       except Exception, ex:
-         print "Exception while read: " + str(ex) + ". Try again."
-         pass
-
+         raise Exception("Exception while read: " + str(ex) + ". Try again.")
+         
       return sample_read
 
 
@@ -301,9 +372,9 @@ class goodweUsb( iGoodwe.iGoodwe) :
 #      print "lenn: " +str(lenn)
       # Call the reply function for the received message
       if cc == CC.reg:
-         self.cc_reg_switch[fc]( src, lenn, data)
+         self.cc_reg_switch[fc]( fc, src, lenn, data)
       elif cc == CC.read:
-         sample_read = self.cc_read_switch[fc]( src, lenn, data)
+         sample_read = self.cc_read_switch[fc]( fc, src, lenn, data)
 
       return sample_read
 
@@ -322,20 +393,26 @@ class goodweUsb( iGoodwe.iGoodwe) :
       return high, low
 
    #--------------------------------------------------------------------------
-   def _skip_message( self, src, lenn, inBuffer):
+   def _skip_reg_message( self, fc, src, lenn, inBuffer):
       '''Not all possible messages have been implemented/can be received. This
-         handles thos messages.'''
-      print "An unused state was received: " + str(self.m_state) + "."
+         handles those messages.'''
+      print "An unused request message was received: " + str(fc) + "."
 
    #--------------------------------------------------------------------------
-   def _reg_received_confirm_removal( self, src, lenn, inBuffer):
+   def _skip_read_message( self, fc, src, lenn, inBuffer):
+      '''Not all possible messages have been implemented/can be received. This
+         handles those messages.'''
+      print "An unused read message was received: " + str(fc) + "."
+
+   #--------------------------------------------------------------------------
+   def _reg_received_confirm_removal( self, fc, src, lenn, inBuffer):
       '''When the inverter sends the removal confirm message.'''
       print "Inverter removed."
       self.m_serialBuffer = ''
       self.m_inverter_adr_confirmed = False
 
    #--------------------------------------------------------------------------
-   def _reg_received_registration( self, src, lenn, inBuffer):
+   def _reg_received_registration( self, fc, src, lenn, inBuffer):
       '''When the inverter sends the registration message.'''
       print "Inverter registration received."
       self.m_serialBuffer = inBuffer[0:16]
@@ -343,7 +420,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       self.m_state = State.ALLOC
 
    #--------------------------------------------------------------------------
-   def _reg_received_confirm_registration( self, src, lenn, inBuffer):
+   def _reg_received_confirm_registration( self, fc, src, lenn, inBuffer):
       '''When the inverter sends the registration confirmation message.'''
       print "Inverter registration confirmation received at address: " + hex(src)
       if self.m_inverter_adr == src:
@@ -353,9 +430,9 @@ class goodweUsb( iGoodwe.iGoodwe) :
          self.m_state = State.OFFLINE
 
    #--------------------------------------------------------------------------
-   def _read_received_message( self, src, lenn, inBuffer):
+   def _read_received_message( self, fc, src, lenn, inBuffer):
       '''When the inverter sends the sample data.'''
-      print "Read message received length: " + str(lenn)
+#      print "Read message received length: " + str(lenn)
       self._convert_data( inBuffer, lenn == 66)
       return True
 
@@ -419,13 +496,27 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
 
    #--------------------------------------------------------------------------
+   def _offline( self):
+      '''Function to handle the message state machine. This function handles
+         the offline state.'''
+      self._terminate_usb()
+      time.sleep(2)
+      self.usb_init()
+      if self.m_dev == None:
+         raise IOError("No USB device found, wait a while and init USB again.")
+      else:
+         self.m_state = State.CONNECTED
+      return False
+      
+   #--------------------------------------------------------------------------
    def _remove_registration( self):
       '''Function to handle the message state machine. This function handles
          the removal of the registration state. No action is needed.'''
-      print "Remove registration."
+      print "Remove registration, addr confirmed: " + str(self.m_inverter_adr_confirmed)
       self._goodwe_send( self.m_inverter_adr, CC.reg, FC.remreg, 0)
       self.m_state = State.DISCOVER
       time.sleep(1)
+      self.m_inverter_adr_confirmed = False
       return False
 
    #--------------------------------------------------------------------------
@@ -435,7 +526,10 @@ class goodweUsb( iGoodwe.iGoodwe) :
       print "Discover Goodwe. address confirmed: " + str(self.m_inverter_adr_confirmed)
       if not self.m_inverter_adr_confirmed:
          self._goodwe_send( 0x7F, CC.reg, FC.offline, 0)
+         print "Request for confirmation sent"
          return True
+         
+      time.sleep(5)
       return False
 
 
@@ -444,9 +538,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Function to handle the message state machine. This function handles
          the registration of the inverter. A message is sent with the 
          previously received serial number.'''
-      print "Allocating register for serial: " + str(self.m_serialBuffer)
       serial=self.m_serialBuffer
-      print "Adding address"
       serial+=chr(self.m_inverter_adr)
       print "Allocated register for serial: " + str(self.m_serialBuffer) + " Sending..."
 
@@ -465,7 +557,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Function to handle the message state machine. This function handles
          the first request of sample data. A message is sent with the
          previously negotiated inverter address.'''
-      print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
+#      print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
       self._goodwe_send( self.m_inverter_adr, CC.read, FC.query, 0)
       self.m_state = State.RUNNING
       return True
@@ -475,10 +567,10 @@ class goodweUsb( iGoodwe.iGoodwe) :
       '''Function to handle the message state machine. This function handles
          subsequent requests of sample data. A message is sent with the
          previously negotiated inverter address.'''
-      print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
+#      print "Reading data from Goodwe at address: " + hex(self.m_inverter_adr)
       if self.m_inverter_adr_confirmed:
          self._goodwe_send( self.m_inverter_adr, CC.read, FC.query, 0)
-	 return True
+         return True
       else:
          raise IOError("Inverter not online, or address unkown. Cannot read.")
 
@@ -494,7 +586,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
       h,l = self._calc_crc16(buf, len(buf))
       buf+=''.join(chr(x) for x in [h,l])
       sendBuffer=''.join(chr(x) for x in [0xCC, 0x99, len(buf)]) + buf
-      self._hexprint("goodwe send", sendBuffer)
+#      self._hexprint("goodwe send", sendBuffer)
 
       lenn = self.m_dev.ctrl_transfer( 0x21, 0x09, 0x200, 0, sendBuffer)
 #      print lenn
@@ -515,6 +607,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
    #--------------------------------------------------------------------------
    def terminate( self):
       self._terminate_usb()
+      self.m_relay.terminate()
 
 
 #---------------- End of file ------------------------------------------------

@@ -12,125 +12,101 @@ class goodweData :
          print "Error:" +str(ex)
       
       try:
-         filteredData = self.filter_data( urlData)
+         self.parse_data( urlData)
       except Exception, arg:
          print "Filter data Error: " + str(arg)
-      try:
-         self.parse_data( filteredData)
-      except Exception, arg:
-         print "Parse data Error: " + str(arg)
-
-   #--------------------------------------------------------------------------
-   def parse_data( self, filteredData):
-   #Parses the filtered data. This will yield nice and usable
-   #data member values.
-   #
-      self.m_sample.set_line( filteredData[0])
-      self.m_sample.set_inverter_status( filteredData[1])
-      self.m_sample.set_inverter_sn( filteredData[2])
-      self.m_sample.set_description( filteredData[3])
-      self.m_sample.set_error( filteredData[8])
-
-      #Values that I'm not using (or don't know what they are
-  #    self.m_sample.set_vbattery( filteredData[15].replace(' ', ''))
-  #    self.m_sample.set_ibattery( filteredData[16].replace(' ', ''))
-  #    self.m_sample.set_soc( filteredData[17].replace(' ', ''))
-  #    self.m_sample.set_load( filteredData[18].replace(' ', ''))
-
-      self.m_sample.set_pgrid( self._convert_line_to_float(filteredData[4]))
-      self.m_sample.set_eday( self._convert_line_to_float(filteredData[5]))
-      self.m_sample.set_etotal( self._convert_line_to_float(filteredData[6]))
-      self.m_sample.set_htotal( self._convert_line_to_float(filteredData[7]))
-      # Only select 1 significant digit after .
-      self.m_sample.set_temperature( self._convert_line_to_float(filteredData[14][0:filteredData[14].find('.')+2]))
-
-      #multi line values, separated by '/'
-      v = filteredData[9].split('/')
-      if len(v) == 2:
-         for frac in range(len(v)):
-            self.m_sample.set_vpv( frac, self._convert_line_to_float(v[frac]))
-
-      i = filteredData[10].split('/')
-      if len(i) == 2:
-         for frac in range(len(i)):
-            self.m_sample.set_ipv( frac, self._convert_line_to_float(i[frac]))
-
-      v = filteredData[11].split('/')
-      if len(v) == 3:
-         for frac in range(len(v)):
-            self.m_sample.set_vac( frac, self._convert_line_to_float(v[frac]))
-
-      i = filteredData[12].split('/')
-      if len(i) == 3:
-         for frac in range(len(i)):
-            self.m_sample.set_iac( frac, self._convert_line_to_float(i[frac]))
-
-      f = filteredData[13].split('/')
-      if len(f) == 3:
-         for frac in range(len(f)):
-            self.m_sample.set_fac( frac, self._convert_line_to_float(f[frac]))
-
-      self.m_sample.set_consume_day( self._convert_line_to_float(filteredData[15]))
-      self.m_sample.set_consume_total( self._convert_line_to_float(filteredData[16]))
-
-      # Calculate efficiency (PowerAC / powerDC)
-      try:
-         ppv = ((self.m_sample.get_vpv(0) * self.m_sample.get_ipv(0)) + (self.m_sample.get_vpv(1) * self.m_sample.get_ipv(1)))
-         if ppv > 0.0:
-            self.m_sample.set_efficiency( self.m_sample.get_pgrid() / ppv)
-      except Exception, arg:
-         print "Calculate Efficiency Error: " + str(arg)
-         self.m_sample.set_efficiency( 0.0)
 
 
    #--------------------------------------------------------------------------
-   def filter_data( self, response):
-   #Filters the URL data. This will select the correct table from the 
+   def parse_data( self, response):
+   #Parses the URL data. This will select the correct table from the 
    #URL data and strip all units from the data strings ready to be 
    #converted to float or integers.
    #
       # Select from the HTTP data the table row with DG_Item
       title = response[response.find('<title>')+7:response.find('</title>')]
-      table = response[response.find('id="tab_big"'):]
-      table = table[table.find('<tr>')+5:]
-      table = table[table.find('<tr>')+5:]
-      table = table[:table.find('</tr>')]
-      table = table.replace(' ', '')
+      table = response[response.find('var pw_info ='):response.find('var pw_id')]
+      inverter = table[table.find('inverter'):]
+      inverter = inverter[12:inverter.find('next_device')]
+      inverter = inverter.replace('"', '')
+      values = inverter.split(',')
+      data = {}
+      
+      # Convert the list into a dictionary for easy access.
+      for f in values:
+         k = f[:f.find(":")]
+         v = f[f.find(":")+1:]
+         data[k] = v
+         
+      # Get the data from the dictionary
+      try:
+         self.m_sample.set_line( 1)
+         print data['status']
+         if data['status'] == "1":
+            self.m_sample.set_inverter_status( 'Normal')
+         else:
+            self.m_sample.set_inverter_status( 'Error')
+         
+         self.m_sample.set_inverter_sn( data['sn'])
+         self.m_sample.set_description( "last refresh: " + data['last_refresh_time'])
+         self.m_sample.set_error( data['warning'])
 
-      # Split the table row in columns using the <td> HTTP tag
-      r = table.split('<td>')
-      l = []
-      for line in r:
-         if '</td>' in line:
-            line=line.replace('</td>', '')
-            line=line.replace('\n', '')
-            line=line.replace('\r', '')
-            l.append(line)
-	    
-      if len(l) != 17:
-          print title
-          print "Response from Goodwe does not contain all data (len=" + str(len(l)) + ") : " + str(l)
-	  
-      return l
+         self.m_sample.set_pgrid( self._convert_line_to_float( data['pac']))
+         self.m_sample.set_eday( self._convert_line_to_float( data['eDay']))
+         self.m_sample.set_etotal( self._convert_line_to_float( data['eTotal']))
+         self.m_sample.set_htotal( self._convert_line_to_float( data['hTotal']))
+         self.m_sample.set_temperature( self._convert_line_to_float(data['tempperature']))
+        
+         self.m_sample.set_vpv( 0, self._convert_line_to_float(data['vpv1']))
+         self.m_sample.set_vpv( 1, self._convert_line_to_float(data['vpv2']))
+         self.m_sample.set_ipv( 0, self._convert_line_to_float(data['ipv1']))
+         self.m_sample.set_ipv( 1, self._convert_line_to_float(data['ipv2']))
+
+         self.m_sample.set_vac( 0, self._convert_line_to_float(data['vac1']))
+         self.m_sample.set_vac( 1, self._convert_line_to_float(data['vac2']))
+         self.m_sample.set_vac( 2, self._convert_line_to_float(data['vac3']))
+         self.m_sample.set_iac( 0, self._convert_line_to_float(data['iac1']))
+         self.m_sample.set_iac( 1, self._convert_line_to_float(data['iac2']))
+         self.m_sample.set_iac( 2, self._convert_line_to_float(data['iac3']))
+         self.m_sample.set_fac( 0, self._convert_line_to_float(data['fac1']))
+         self.m_sample.set_fac( 1, self._convert_line_to_float(data['fac2']))
+         self.m_sample.set_fac( 2, self._convert_line_to_float(data['fac3']))
+
+         self.m_sample.set_consume_day( 0.0)
+         self.m_sample.set_consume_total( 0.0)
+
+         # Calculate efficiency (PowerAC / powerDC)
+         try:
+            ppv = ((self.m_sample.get_vpv(0) * self.m_sample.get_ipv(0)) + (self.m_sample.get_vpv(1) * self.m_sample.get_ipv(1)))
+            if ppv > 0.0:
+               self.m_sample.set_efficiency( self.m_sample.get_pgrid() / ppv)
+         except Exception, arg:
+            print "Calculate Efficiency Error: " + str(arg)
+            self.m_sample.set_efficiency( 0.0)
+         except:
+            pass
+      except Exception, ex:
+         raise IOError("Data from Goodwe portal not correct: " + str(ex))
+
 
    #--------------------------------------------------------------------------
    def _convert_line_to_float( self, line):
       retval = 0.0
       try:
-	 line=line.replace('A', '')
-	 line=line.replace('V', '')
-	 line=line.replace('K', '')
-	 line=line.replace('W', '')
-	 line=line.replace('h', '')
-	 line=line.replace('k', '')
-	 line=line.replace('H', '')
-	 line=line.replace('z', '')
-	 line=line.replace('%', '')
-	 line=line.replace(' ', '')
+         line=line.replace('A', '')
+         line=line.replace('V', '')
+         line=line.replace('K', '')
+         line=line.replace('W', '')
+         line=line.replace('h', '')
+         line=line.replace('k', '')
+         line=line.replace('H', '')
+         line=line.replace('z', '')
+         line=line.replace('%', '')
+         line=line.replace(' ', '')
          retval = float(line)
       except(ValueError):
-	 retval = 0.0
-	 return retval
+         retval = 0.0
+         return retval
 
       return retval
     
@@ -147,7 +123,7 @@ class goodweData :
    def is_online( self):
    #TRUE when the GoodWe inverter returns the correct status
    #
-      return ((self.m_sample.is_inverter_status('Normal')) and (abs(self.m_sample.get_vpv(0)+self.m_sample.get_vpv(1)) > 0.01))
+      return self.m_sample.is_online()
       
 
    #--------------------------------------------------------------------------

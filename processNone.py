@@ -1,3 +1,4 @@
+import time
 
 class processNone :
 
@@ -15,7 +16,8 @@ class processNone :
    def processSample( self, gw):
       if self.m_pvoutput:
          self.m_pvoutput.post_data( gw)
-      print "Logging: " + gw.to_short_string()
+      t = time.localtime(time.time())
+      print "Logging:   " + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + "h " + gw.to_short_string()
 
 
 #---------------- End of file ------------------------------------------------

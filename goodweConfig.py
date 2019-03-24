@@ -11,6 +11,13 @@ class goodweConfig :
    SERIAL_BAUDRATE = 'serial_baudrate'
    SERIAL_DEVICE = 'serial_device'
    WIFI_ADDRESS = 'wifi_address'
+   GPIO_USB_PIN = 'gpio_usb_pin'
+   TEMP_MONITOR = 'temp_monitor'
+   GPIO_FAN_V1 = 'gpio_fan_V1'
+   GPIO_FAN_V2 = 'gpio_fan_V2'
+   GPIO_FAN_ON1 = 'gpio_fan_on1'
+   GPIO_FAN_ON2 = 'gpio_fan_on2'
+   USB_SAMPLE_INTERVAL = 'usb_sample_interval'
 
    #--------------------------------------------------------------------------
    def __init__( self, configFile):
@@ -55,9 +62,26 @@ class goodweConfig :
                self.serial_device = line.replace(self.SERIAL_DEVICE, '')
 	    if self.WIFI_ADDRESS in line:
                self.wifi_address = line.replace(self.WIFI_ADDRESS, '')
+	    if self.GPIO_USB_PIN in line:
+               self.gpio_usb_pin = line.replace(self.GPIO_USB_PIN, '')
+	    if self.GPIO_FAN_V1 in line:
+               self.gpio_fan_V1 = line.replace(self.GPIO_FAN_V1, '')
+	    if self.TEMP_MONITOR in line:
+               self.temp_monitor = line.replace(self.TEMP_MONITOR, '')
+	    if self.GPIO_FAN_V2 in line:
+               self.gpio_fan_V2 = line.replace(self.GPIO_FAN_V2, '')
+	    if self.GPIO_FAN_ON1 in line:
+               self.gpio_fan_on1 = line.replace(self.GPIO_FAN_ON1, '')
+	    if self.GPIO_FAN_ON2 in line:
+               self.gpio_fan_on2 = line.replace(self.GPIO_FAN_ON2, '')
+	    if self.USB_SAMPLE_INTERVAL in line:
+               self.usb_sample_interval = float(line.replace(self.USB_SAMPLE_INTERVAL, ''))
 
-      self.goodwe_url = 'http://%s.goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail' % (self.goodwe_server)
-      self.goodwe_loginUrl = 'http://%s.goodwe-power.com/User/Login' % (self.goodwe_server)
+
+#OLD      self.goodwe_url = 'http://%s.goodwe-power.com/PowerStationPlatform/PowerStationReport/InventerDetail' % (self.goodwe_server)
+#         self.goodwe_loginUrl = 'http://%s.goodwe-power.com/User/Login' % (self.goodwe_server)
+      self.goodwe_url = 'https://www.semsportal.com'
+      self.goodwe_loginUrl = '/home/login'
 
    #--------------------------------------------------------------------------
    def to_string( self):
@@ -80,6 +104,10 @@ class goodweConfig :
       print self.SERIAL_BAUDRATE + " (" + str(self.serial_baudrate) + ")"
       print self.SERIAL_DEVICE + " (" + str(self.serial_device) + ")"
       print self.WIFI_ADDRESS + " (" + str(self.wifi_address) + ")"
+      print self.GPIO_USB_PIN + " (" + str(self.gpio_usb_pin) + ")"
+      print self.USB_SAMPLE_INTERVAL + " (" + str(self.usb_sample_interval) + ")"
+      print self.TEMP_MONITOR + " (" + str(self.temp_monitor) + ")"
+      print "FAN pins: (" + str(self.gpio_fan_V1) + ", " + str(self.gpio_fan_V2) + ", " + str(self.gpio_fan_on1) + ", " + str(self.gpio_fan_on2) + ")"
       
             
    #--------------------------------------------------------------------------
@@ -171,5 +199,29 @@ class goodweConfig :
    # Returns the wifi_address
    #
       return self.wifi_address
+
+   #--------------------------------------------------------------------------
+   def get_gpio_usb_pin( self):
+   # Returns the USB GPIO pin
+   #
+      return self.gpio_usb_pin
+
+   #--------------------------------------------------------------------------
+   def get_temp_monitor( self):
+   # Returns the FAN gpio pins
+   #
+      return self.temp_monitor
+
+   #--------------------------------------------------------------------------
+   def get_gpio_fan_pins( self):
+   # Returns the FAN gpio pins
+   #
+      return (self.gpio_fan_V1, self.gpio_fan_V2, self.gpio_fan_on1, self.gpio_fan_on2)
+
+   #--------------------------------------------------------------------------
+   def get_usb_sample_interval( self):
+   # Returns the USB sample period
+   #
+      return self.usb_sample_interval
 
 #---------------- End of file ------------------------------------------------

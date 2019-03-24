@@ -3,8 +3,14 @@ class iGoodwe :
 
    #--------------------------------------------------------------------------
    def __init__(self, url, login_url, station_id):
-      pass      
-
+      pass
+      
+   #--------------------------------------------------------------------------
+   def subscribe_temperature( self, method):
+   #Subscribes method to the temperature value.
+   #
+      pass
+   
    #--------------------------------------------------------------------------
    def initialize(self):
       '''initialize'''
@@ -20,5 +26,10 @@ class iGoodwe :
       '''Read a data sample.'''
       return None         
       
-                  
+   #--------------------------------------------------------------------------
+   def terminate( self):
+      '''Read a data sample.'''
+      return None         
+   
+                     
 #---------------- End of file ------------------------------------------------

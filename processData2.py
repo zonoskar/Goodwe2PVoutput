@@ -1,28 +1,29 @@
 import numpy as np
 import goodweSample
 import copy
+import time
 
 class processData2 :
 
    funcs = { 'vpv0': goodweSample.goodweSample.get_vpv0,\
-	     'vpv1': goodweSample.goodweSample.get_vpv1,\
-	     'ipv0': goodweSample.goodweSample.get_ipv0,\
-	     'ipv1': goodweSample.goodweSample.get_ipv1,\
-	     'vac0': goodweSample.goodweSample.get_vac0,\
-	     'vac1': goodweSample.goodweSample.get_vac1,\
-	     'vac2': goodweSample.goodweSample.get_vac2,\
-	     'iac0': goodweSample.goodweSample.get_iac0,\
-	     'iac1': goodweSample.goodweSample.get_iac1,\
-	     'iac2': goodweSample.goodweSample.get_iac2,\
-	     'fac0': goodweSample.goodweSample.get_fac0,\
-	     'fac1': goodweSample.goodweSample.get_fac1,\
-	     'fac2': goodweSample.goodweSample.get_fac2,\
-	     'pgrid': goodweSample.goodweSample.get_pgrid,\
-	     'eday': goodweSample.goodweSample.get_eday,\
-	     'etotal': goodweSample.goodweSample.get_etotal,\
-	     'htotal': goodweSample.goodweSample.get_htotal,\
-	     'temperature': goodweSample.goodweSample.get_temperature,\
-	     'efficiency': goodweSample.goodweSample.get_efficiency }
+             'vpv1': goodweSample.goodweSample.get_vpv1,\
+             'ipv0': goodweSample.goodweSample.get_ipv0,\
+             'ipv1': goodweSample.goodweSample.get_ipv1,\
+             'vac0': goodweSample.goodweSample.get_vac0,\
+             'vac1': goodweSample.goodweSample.get_vac1,\
+             'vac2': goodweSample.goodweSample.get_vac2,\
+             'iac0': goodweSample.goodweSample.get_iac0,\
+             'iac1': goodweSample.goodweSample.get_iac1,\
+             'iac2': goodweSample.goodweSample.get_iac2,\
+             'fac0': goodweSample.goodweSample.get_fac0,\
+             'fac1': goodweSample.goodweSample.get_fac1,\
+             'fac2': goodweSample.goodweSample.get_fac2,\
+             'pgrid': goodweSample.goodweSample.get_pgrid,\
+             'eday': goodweSample.goodweSample.get_eday,\
+             'etotal': goodweSample.goodweSample.get_etotal,\
+             'htotal': goodweSample.goodweSample.get_htotal,\
+             'temperature': goodweSample.goodweSample.get_temperature,\
+             'efficiency': goodweSample.goodweSample.get_efficiency }
 
    #--------------------------------------------------------------------------
    def __init__( self, pvoutput):
@@ -39,10 +40,10 @@ class processData2 :
    def _fitSample(self, getter):
    #
       val = np.array([ getter(self.sampleBuffer[0]),\
-		       getter(self.sampleBuffer[1]),\
+                       getter(self.sampleBuffer[1]),\
                        getter(self.sampleBuffer[2]),\
-		       getter(self.sampleBuffer[3]),\
-		       getter(self.sampleBuffer[4])])
+                       getter(self.sampleBuffer[3]),\
+                       getter(self.sampleBuffer[4])])
       y = np.array([ 0.0, 1.0, 2.0, 3.0, 4.0])
       z = np.polyfit( y, val, 2.0)
       
@@ -55,7 +56,7 @@ class processData2 :
       return retval
       
 
-	    
+            
    #--------------------------------------------------------------------------
    def fitAndLog( self, sample):
    #
@@ -83,7 +84,8 @@ class processData2 :
       
       if self.m_pvoutput:
          self.m_pvoutput.post_data( self.log)
-      print "Logging: " + self.log.to_short_string()
+      t = time.localtime(time.time())
+      print "Logging:  " + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + "h " + self.log.to_short_string()
 
    
    #--------------------------------------------------------------------------
@@ -91,8 +93,9 @@ class processData2 :
    #
       if (self.bufferedSamples < 5):
          self.sampleBuffer.append( sample);
-	 self.bufferedSamples += 1
-	 print "Buffering sample " + sample.to_short_string()
+         self.bufferedSamples += 1
+         t = time.localtime(time.time())
+         print "Buffering: " + str(t.tm_hour).zfill(2) + ':' + str(t.tm_min).zfill(2) + "h " + sample.to_short_string()
       else:
          self.fitAndLog( self.sampleBuffer[2])
          self.sampleBuffer[0] = self.sampleBuffer[1]
