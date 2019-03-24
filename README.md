@@ -62,5 +62,13 @@ Make sure the file is readable by everyone.
 
 For USB access, change the USB permission according to this site: http://ask.xmodulo.com/change-usb-device-permission-linux.html
 
+
+##############################################################
+## USB mode is in development, but should work
+##############################################################
+To enable USB mode, attach a USB cable and change the input_source to USB. However, on my inverter, this only works after the inverter has started. I split the USB cable and added a simple 2-way relais between. This USB relais is switched using the GPIO pin specified in the corresponding setting. See the supplied default config file for more info. This is all alpha software, so use at your own risk.
+
+
+
 Start:
 python -m Goodwe2PVoutput
