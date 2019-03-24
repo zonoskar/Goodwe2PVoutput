@@ -10,6 +10,7 @@ Python modules needed (most of them are standard, the install command is given w
 - enum
 - numpy (pip install numpy)
 - requests (pip install requests)
+- serial (pip install pyserial)
 
 
 Script to upload Goodwe power invertor data to PVoutput website. Now also logs extended data to PVoutput:
@@ -59,6 +60,7 @@ end of the line will be ignored. An example is provided in the data direcotry.
 
 Make sure the file is readable by everyone.
 
+For USB access, change the USB permission according to this site: http://ask.xmodulo.com/change-usb-device-permission-linux.html
 
 Start:
 python -m Goodwe2PVoutput
