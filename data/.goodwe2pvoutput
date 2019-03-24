@@ -1,14 +1,24 @@
 #comment line
-goodwe_system_id: # Goodwe System ID
+goodwe_system_id: # Goodwe System ID, not used anymore.
 goodwe_user_id: # Goodwe User ID
-goodwe_server: # eu, au or www
+goodwe_server: # must be www
 goodwe_passwd: # optional password for goodwe-power.com
 pvoutput_system_id: # PVoutput SystemID
 pvoutput_api: # PVoutput API key
 csv_dir: # Directory on your system where the CSV file can be written. Make sure it's writable.
 spline_fit: True # Or False if you want to keep the old data.
 input_source: URL # or USB, but this option doesn't work yet so keep it at URL please.
+
 #the following are optional and don't do anything yet.
 serial_baudrate: # 9600
 serial_device: # /dev/ttyUSB0
 wifi_address: # 192.168.192.99
+
+# The following are used, but only if you add the appropriate hardware
+gpio_usb_pin: # GPIO pin number for switching the USB cable on/off
+temp_monitor: # Temperature monitoring can switch a couple of fans, if attached to the specified GPIO pins:
+gpio_fan_V1: # GPIO pin number to select low voltage for fans
+gpio_fan_V2: # GPIO pin number to select high voltage for fans
+gpio_fan_on1: # GPIO pin number to select switch on/off fan #1
+gpio_fan_on2: # GPIO pin number to select switch on/off fan #2
+usb_sample_interval: # Only used when connected to the USB port.
