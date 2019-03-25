@@ -2,7 +2,6 @@ import requests
 import goodweData
 import iGoodwe
 import json
-import BeautifulSoup
 
 class readGoodwe( iGoodwe.iGoodwe) :
 
