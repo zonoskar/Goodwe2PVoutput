@@ -52,7 +52,7 @@ class GoodweFactory :
             import processData2
             process = processData2.processData2( pvoutput)
          else:
-            import processData2
+            import processData
             process = processData.processData( pvoutput)
 
       return goodwe, process

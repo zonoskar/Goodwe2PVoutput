@@ -41,7 +41,6 @@ class goodweData :
       # Get the data from the dictionary
       try:
          self.m_sample.set_line( 1)
-         print data['status']
          if data['status'] == "1":
             self.m_sample.set_inverter_status( 'Normal')
          else:

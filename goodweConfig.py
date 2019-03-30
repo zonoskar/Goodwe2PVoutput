@@ -177,7 +177,7 @@ class goodweConfig :
    def get_spline_fit( self):
    # Returns the pvoutput_url
    #
-      return self.spline_fit
+      return self.spline_fit == "True"
 
    #--------------------------------------------------------------------------
    def get_input_source( self):
