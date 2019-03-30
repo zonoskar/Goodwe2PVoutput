@@ -2,7 +2,6 @@ import goodweConfig
 import GoodweFactory
 import pvoutput
 import csvoutput
-import tempMonitor
 import time
 import getpass
 import os
@@ -64,6 +63,8 @@ if __name__ == "__main__":
       print ex
 
    if config.get_temp_monitor():
+      print "Setting up temperature monitoring."
+      import tempMonitor
       tempMonitor.tempMonitor( goodwe, config.get_gpio_fan_pins())
 
    # Perform main loop

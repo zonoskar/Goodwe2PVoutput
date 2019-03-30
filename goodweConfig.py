@@ -213,7 +213,7 @@ class goodweConfig :
    def get_temp_monitor( self):
    # Returns the FAN gpio pins
    #
-      return self.temp_monitor
+      return (self.temp_monitor == "True")
 
    #--------------------------------------------------------------------------
    def get_gpio_fan_pins( self):
