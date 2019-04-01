@@ -58,7 +58,8 @@ class goodweUsb( iGoodwe.iGoodwe) :
    def initialize( self):
       '''Initialize the USB port'''
       self.m_stop = False
-      self.m_worker = goodweUsbWorker( 1, "worker", self.m_gpio_pin, self.m_station_id, self.m_sample_interval)
+      comms = goodweUsbComms( self.m_gpio_pin, '', self.m_station_id)
+      self.m_worker = goodweUsbWorker( 1, "worker", comms, self.m_sample_interval)
       print "Starting worker thread from goodweUsb"
       self.m_worker.start()
       return False
@@ -91,6 +92,7 @@ class goodweUsb( iGoodwe.iGoodwe) :
    def read_sample_data( self):
       '''Read a data sample.'''
       if self.m_worker and self.m_worker.is_online():
+         print "Worker is online"
          sample = self.m_worker.get_current_value()
          for subscriber in self.subscribers:
             subscriber( sample.get_temperature())
@@ -101,16 +103,23 @@ class goodweUsb( iGoodwe.iGoodwe) :
 
 class goodweUsbWorker( threading.Thread):
    #--------------------------------------------------------------------------
-   def __init__(self, threadId, name, gpio_pin, usb_id, interval):
+   def __init__(self, threadId, name, comms, interval):
       threading.Thread.__init__(self)
       self.m_threadId = threadId
       self.m_name = name
       self.m_sample_interval = interval
-      self.m_current_value = goodweSample.goodweSample()
       self.m_stop = False
-      self.m_comms = goodweUsbComms( gpio_pin, '', usb_id)
+      self.m_comms = comms
+      print "Set current sample in USB worker"
+      try:
+         self.m_current_value = self.m_comms.get_sample()
+         print self.m_current_value.to_string()
+         self.m_readError = False
+      except:
+         self.m_current_value = goodweSample.goodweSample()
+         self.m_readError = True
+         
       self.m_lock = threading.Lock()
-      self.m_readError = True
       print "Init USB thread worker at " + str(interval) + " Hz."
 
    #--------------------------------------------------------------------------
@@ -167,9 +176,9 @@ class goodweUsbWorker( threading.Thread):
    def sleep( self, seconds):
       if seconds > 0:
          time.sleep( seconds)
+
       
 class goodweUsbComms :
-
    #--------------------------------------------------------------------------
    def __init__(self, usb_pin, emulated, usb_id):
       '''Initialisation of the goodweUsb class. All data members are set

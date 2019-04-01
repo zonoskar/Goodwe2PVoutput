@@ -14,6 +14,7 @@ def mainloop( goodwe, pvoutput, csv, process):
       while True:
          interval = 5.0*60
          try: # Read Goodwe data from goodwe-power.com
+#            print "read sample"
             gw = goodwe.read_sample_data()
          except Exception, arg:
             interval = 1.0*60
@@ -21,7 +22,9 @@ def mainloop( goodwe, pvoutput, csv, process):
          else:
             if goodwe.is_online():
                # write CSV file
+#               print "CSV sample"
                csv.write_data( gw)
+#               print "Process sample"
                process.processSample( gw)
             else:
                # Wait for the inverter to come online

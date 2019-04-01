@@ -28,6 +28,7 @@ class goodweConfig :
       # there is a spelling error in the goodwe URL).
       self.pvoutput_url = 'http://pvoutput.org/service/r2/addstatus.jsp'
       self.spline_fit = False
+      self.temp_monitor = False
       self.goodwe_passwd = ''
       
       with open( configFile) as fp:
@@ -67,7 +68,7 @@ class goodweConfig :
             if self.GPIO_FAN_V1 in line:
                self.gpio_fan_V1 = line.replace(self.GPIO_FAN_V1, '')
             if self.TEMP_MONITOR in line:
-               self.temp_monitor = line.replace(self.TEMP_MONITOR, '')
+               self.temp_monitor = line.replace(self.TEMP_MONITOR, '') == "True"
             if self.GPIO_FAN_V2 in line:
                self.gpio_fan_V2 = line.replace(self.GPIO_FAN_V2, '')
             if self.GPIO_FAN_ON1 in line:
@@ -177,7 +178,7 @@ class goodweConfig :
    def get_spline_fit( self):
    # Returns the pvoutput_url
    #
-      return self.spline_fit == "True"
+      return self.spline_fit
 
    #--------------------------------------------------------------------------
    def get_input_source( self):
@@ -213,7 +214,7 @@ class goodweConfig :
    def get_temp_monitor( self):
    # Returns the FAN gpio pins
    #
-      return (self.temp_monitor == "True")
+      return self.temp_monitor
 
    #--------------------------------------------------------------------------
    def get_gpio_fan_pins( self):
