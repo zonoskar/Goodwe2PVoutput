@@ -12,7 +12,9 @@ class readGoodwe( iGoodwe.iGoodwe) :
    #
       self.subscribers= []
       self.m_goodwe_url = url
+      self.m_goodwe_station_url = None
       self.m_login_url = url+login_url
+      self.m_login_payload = None
       self.m_station_id = station_id
       self.m_session = None
       self.gwData = None
@@ -32,14 +34,24 @@ class readGoodwe( iGoodwe.iGoodwe) :
    def login(self, username, password):
    # Log in Goodwe-power web site.
    #
-      payload = {
+      self.m_login_payload = {
          'account': username,
          'pwd': password }
+
+      self.create_session()
+
+   def create_session(self):
       url = self.m_login_url
 
+      # Close old session
+      if self.m_session:
+         self.m_session.close()
+         self.m_session = None
+
+      # Start new session and authenticate
       with requests.Session() as self.m_session:
-         print "login :" + url
-         p = self.m_session.post( url, data=payload)
+         print "Login URL: " + url
+         p = self.m_session.post( url, data=self.m_login_payload)
          j=json.loads(p.text)
          print "Sent password " + str(p.status_code)
          if p.status_code != 200:
@@ -48,10 +60,11 @@ class readGoodwe( iGoodwe.iGoodwe) :
          else:
             print "Login repsonse code: " + str(j.get('code'))
             if j.get('code') != 0:
-               raise IOError("Incorrect password site " + str(url) + " and user " + str(username))
+               raise IOError("Incorrect password site " + str(url) + " and user " + str(self.m_login_payload['account']))
             else:
-               self.m_goodwe_url += j.get('data').get('redirect')
-               print "Station URL found: " + str(self.m_goodwe_url)
+               # Store station URL
+               self.m_goodwe_station_url = self.m_goodwe_url + j.get('data').get('redirect')
+               print "Station URL found: " + str(self.m_goodwe_station_url)
 
          
 
@@ -69,11 +82,21 @@ class readGoodwe( iGoodwe.iGoodwe) :
             for subscriber in self.subscribers:
                subscriber( self.gwData.get_sample().get_temperature())
             return self.gwData.get_sample()
-         except Exception, ex:
+         except EOFError, ex:
+            # Try to create a new session
+            print "Session authentication ended, creating new session"
             tries += 1
-            if tries > 3:
-               print "Cannot read data after " + str(tries) + " tries: " + str(ex)
-               raise ValueError
+            try:
+               self.create_session()
+            except Exception, ex:
+               print "Failed to create new session: " + str(ex)
+         except Exception, ex:
+            print "Error reading data. Trying again. Error: " + str(ex)
+            tries += 1
+
+         if tries > 3:
+            print "Cannot read data after " + str(tries) + " tries, giving up"
+            raise ValueError
 
          
    #--------------------------------------------------------------------------
@@ -99,8 +122,8 @@ class readGoodwe( iGoodwe.iGoodwe) :
    # Do the actual read from the URL
    #
       if self.m_session:
-         r = self.m_session.get( self.m_goodwe_url, 
-                                 headers = dict( referer = self.m_goodwe_url))
+         r = self.m_session.get( self.m_goodwe_station_url, 
+                                 headers = dict( referer = self.m_goodwe_station_url))
          return r.content
       return ""
                   
