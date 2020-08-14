@@ -4,18 +4,11 @@ class goodweData :
 
    #--------------------------------------------------------------------------
    def __init__( self, urlData):
-   #Initialization of the goodweData class. All data members are set
-   #to default values. Then the urlData is filtered and parsed
-      try:
-         self.m_sample = goodweSample.goodweSample()
-      except Exception, ex: 
-         print "Error:" +str(ex)
-      
-      try:
-         self.parse_data( urlData)
-      except Exception, arg:
-         print "Filter data Error: " + str(arg)
-
+   #Initialization of the goodweSample data object. All data members are set
+   #to default values.
+      self.m_sample = goodweSample.goodweSample()
+      # Parse and filter the urlData. This can throw an IOError or EOFError.
+      self.parse_data( urlData)
 
    #--------------------------------------------------------------------------
    def parse_data( self, response):
@@ -29,6 +22,11 @@ class goodweData :
       inverter = table[table.find('inverter'):]
       inverter = inverter[12:inverter.find('next_device')]
       inverter = inverter.replace('"', '')
+
+      # Check against empty string. This could mean that the session has expired.
+      if not inverter:
+         raise EOFError("Inverter data empty, probably the session expired.")
+
       values = inverter.split(',')
       data = {}
       
