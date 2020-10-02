@@ -1,5 +1,4 @@
-# Goodwe2PVoutput
-=================
+# Goodwe2PVoutPUT
 Python modules needed (most of them are standard, the install command is given when non-standard):-
 1. time
 2. copy
