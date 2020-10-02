@@ -1,20 +1,22 @@
 # Goodwe2PVoutput
-Python modules needed (most of them are standard, the install command is given when non-standard):
-- time
-- copy
-- usb (pip install pyusb)
-- array
-- copy
-- time
-- zlib
-- enum
-- numpy (pip install numpy)
-- requests (pip install requests)
-- serial (pip install pyserial)
-- pyping (pip install pyping)
+=================
+Python modules needed (most of them are standard, the install command is given when non-standard):-
+1. time
+2. copy
+3. usb (pip install pyusb)
+4. array
+5. copy
+6. time
+7. zlib
+8. enum
+9. numpy (pip install numpy)
+10. requests (pip install requests)
+11. serial (pip install pyserial)
+12. pyping (pip install pyping)
 
 
 Script to upload Goodwe power invertor data to PVoutput website. Now also logs extended data to PVoutput:
+=========================================================================================================
 
 v7: Voltage of string 1
 
@@ -73,3 +75,5 @@ To enable USB mode, attach a USB cable and change the input_source to USB. Howev
 
 Start:
 python -m Goodwe2PVoutput
+
+"THANK YOU FOR GIVING ME YOUR PRECIOUS TIME"
