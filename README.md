@@ -1,4 +1,4 @@
-# Goodwe2PVoutput
+# Goodwe2PVoutput- an Amazing project
 Python modules needed (most of them are standard, the install command is given when non-standard):
 - time
 - copy
