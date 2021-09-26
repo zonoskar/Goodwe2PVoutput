@@ -13,6 +13,7 @@ Python modules needed (most of them are standard, the install command is given w
 - serial (pip install pyserial)
 - pyping (pip install pyping)
 - pyusb (pip install pyusb)
+- wifi (pip install wifi)
 
 Script to upload Goodwe power invertor data to PVoutput website. Now also logs extended data to PVoutput:
 
